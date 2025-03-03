@@ -1,7 +1,5 @@
-package com.whereisagift.resolver;
+package com.whereisagift.user;
 
-import com.whereisagift.model.User;
-import com.whereisagift.repository.UserRepository;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

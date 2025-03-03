@@ -1,6 +1,5 @@
-package com.whereisagift.repository;
+package com.whereisagift.user;
 
-import com.whereisagift.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
