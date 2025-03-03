@@ -1,4 +1,4 @@
-package com.example.wishlistAppG.model;
+package com.whereisagift.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

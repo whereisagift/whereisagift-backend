@@ -1,6 +1,6 @@
-package com.example.wishlistAppG.repository;
+package com.whereisagift.repository;
 
-import com.example.wishlistAppG.model.User;
+import com.whereisagift.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

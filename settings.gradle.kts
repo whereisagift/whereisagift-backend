@@ -1,1 +1,1 @@
-rootProject.name = "wishlistAppG"
+rootProject.name = "whereIsAGift"

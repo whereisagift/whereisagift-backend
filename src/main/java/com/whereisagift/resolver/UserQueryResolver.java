@@ -1,7 +1,7 @@
-package com.example.wishlistAppG.resolver;
+package com.whereisagift.resolver;
 
-import com.example.wishlistAppG.model.User;
-import com.example.wishlistAppG.repository.UserRepository;
+import com.whereisagift.model.User;
+import com.whereisagift.repository.UserRepository;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
