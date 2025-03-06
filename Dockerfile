@@ -1,24 +1,12 @@
-# Используем официальный образ OpenJDK 17
-FROM eclipse-temurin:17-jdk AS build
+# Базовый образ с JDK 17
+FROM eclipse-temurin:17-jdk
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+# Копируем файл сборки (JAR)
+COPY build/libs/whereIsAGift-0.0.1-SNAPSHOT.jar app.jar
 
-# Копируем файлы проекта
-COPY . .
-
-# Собираем приложение с помощью Gradle
-RUN ./gradlew build -x test
-
-# Используем минимальный образ для запуска
-FROM eclipse-temurin:17-jre
-
-# Устанавливаем рабочую директорию
-WORKDIR /app
-
-# Копируем собранный JAR из предыдущего этапа
-COPY --from=build /app/build/libs/*.jar app.jar
+# Указываем, какой порт будет использовать приложение
+EXPOSE 8080
 
 # Запускаем приложение
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
