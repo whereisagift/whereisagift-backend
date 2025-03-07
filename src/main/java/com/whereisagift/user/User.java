@@ -8,9 +8,11 @@ import jakarta.validation.constraints.Size;
 @Table(name = "users")
 public class User {
 
+    public User() {}
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ids;
+    private Long id;
 
     @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true)

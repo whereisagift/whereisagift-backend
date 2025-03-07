@@ -19,8 +19,10 @@ repositories {
 
 
 dependencies {
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("org.projectlombok:lombok:1.18.36")
-//	implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:11.1.0")
+	implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:11.1.0")
+	implementation("com.graphql-java:graphql-java-extended-scalars:22.0")
 	implementation("com.graphql-java-kickstart:graphql-java-tools:11.1.0")
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
 	implementation("org.springframework.boot:spring-boot-starter-validation:2.7.4")
@@ -35,4 +37,8 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.bootRun {
+	jvmArgs = listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000")
 }

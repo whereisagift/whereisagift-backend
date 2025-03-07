@@ -1,23 +1,45 @@
 services:
-  backend:
+  app:
+    container_name: spring-boot-postgres-gradle-container
+    networks:
+      - spring-boot-postgres-network
     build:
       context: ./  # Контекст сборки — корневая папка проекта
-      dockerfile: Dockerfile  # Указываем имя Dockerfile
+      dockerfile: Dockerfile
     env_file:
-      - .env  # Подключаем переменные
+      - .env
     depends_on:
-      - postgres
+      db:
+        condition: service_healthy  # Гарантируем, что БД готова
     ports:
-      - "8080:8080"
+      - ${APPLICATION_PORT_ON_DOCKER_HOST}:${APPLICATION_PORT_ON_CONTAINER}
+      - ${DEBUG_PORT_ON_DOCKER_HOST}:${DEBUG_PORT_ON_CONTAINER}
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: ["./gradlew", "bootRun"]
 
-  postgres:
+  db:
+    container_name: postgres-container
     image: postgres:16
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      - ${DB_PORT_ON_DOCKER_HOST}:${DB_PORT_ON_CONTAINER}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./docker/initdb:/docker-entrypoint-initdb.d
+    networks:
+      - spring-boot-postgres-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s
+
 volumes:
-  postgres_data:
+  db:
+
+networks:
+  spring-boot-postgres-network:
