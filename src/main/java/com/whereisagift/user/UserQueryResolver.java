@@ -12,7 +12,7 @@ public class UserQueryResolver implements GraphQLQueryResolver {
     @Autowired
     UserRepository userRepository;
 
-    public User usernameById(Long id) {
+    public User userById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
