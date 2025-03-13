@@ -3,16 +3,14 @@ package com.whereisagift.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Data
-@Component
+@NoArgsConstructor
 @Table(name = "users")
-public class User implements Serializable {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +18,6 @@ public class User implements Serializable {
     @Size(min = 3, max = 50)
     @Column(nullable = false)
     private String name;
-
-    public User() {
-    }
 
     public User(String name) {
         this.name = name;
