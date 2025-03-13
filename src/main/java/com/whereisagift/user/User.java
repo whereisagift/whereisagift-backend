@@ -2,41 +2,30 @@ package com.whereisagift.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 
 @Entity
+@Data
+@Component
 @Table(name = "users")
-public class User {
-
-    public User() {}
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Size(min = 3, max = 50)
-    @Column(nullable = false, unique = true)
-    private String username;
     @Column(nullable = false)
-    private String password;
-//    @Email
-//    @Column(nullable = false, unique = true)
-//    private String email;
-//    @Column(name = "dateOfBirth")
-//    private LocalDate dateOfBirth;
-//    @Column(name = "profilePicture")
-//    private String profilePicture;
-//    @Column(name = "dateOfCreate")
-//    private LocalDateTime dateOfCreate;
-//
-//    @PrePersist
-//    protected void onCreate() {
-//        dateOfCreate = LocalDateTime.now();
-//    }
+    private String name;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
     }
 
 }
