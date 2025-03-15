@@ -1,4 +1,4 @@
-INSERT INTO users (id, name, email) VALUES
-(1, 'Alice', 'alice@example.com'),
-(2, 'Bob', 'bob@example.com')
+insert into users (id, name) values
+(1, 'Alice'),
+(2, 'Bob')
 ON CONFLICT DO NOTHING;
