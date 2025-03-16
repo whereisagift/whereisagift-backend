@@ -1,9 +1,12 @@
 package com.whereisagift.wishlist;
 
 import com.whereisagift.user.User;
+import com.whereisagift.wish.Wish;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -21,6 +24,8 @@ public class Wishlist {
     @JoinColumn(name = "creator_id")
     private User creator;
 
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wish> wishes;
 
 
 }
