@@ -1,14 +1,23 @@
 type User {
-    id: ID!
+    id: ID
     name: String!
+    wishlists: [Wishlist]
 }
 
+type Wishlist {
+    id: ID
+    name: String!
+    user: User!
+}
 
 type Query {
     users: [User!]!
     userById(id: ID!): User
+    wishlists: [Wishlist]
 }
 
 type Mutation {
     createUser(name: String!): User
+    createWishlist(name: String!, creator_id: ID!): Wishlist
 }
+
