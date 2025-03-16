@@ -27,10 +27,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Wishlist> wishlists;
 
-//    public User(String name) {
-//        this.name = name;
-//    }
-
 }
 
 
