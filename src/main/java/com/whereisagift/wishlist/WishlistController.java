@@ -32,17 +32,12 @@ public class WishlistController {
         return wishlistRepository.findAll();
     }
 
-    @QueryMapping
-    public Iterable<Wishlist> wishlistsOfUser(@Argument Long id) {
-        return wishlistRepository.findByUserId(id);
-    }
-
     @MutationMapping
-    public Wishlist createWishlist(@Argument String name, @Argument Long creator_id) {
+    public Wishlist createWishlist(@Argument String name) {
         Wishlist wishlist = new Wishlist();
         wishlist.setName(name);
-        User user = userRepository.findById(creator_id).orElse(null);
-        wishlist.setUser(user);
+        User user = userRepository.findById(1L).orElse(null);
+        wishlist.setCreator(user);
         return wishlistRepository.save(wishlist);
     }
 
