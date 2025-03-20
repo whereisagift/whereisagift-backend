@@ -1,9 +1,12 @@
 package com.whereisagift.wish;
 
+import com.whereisagift.user.User;
 import com.whereisagift.wishlist.Wishlist;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -19,7 +22,15 @@ public class Wish {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "wishlist_id")
-    private Wishlist wishlist;
+    @JoinColumn(name = "creator_id")
+    private User creator;
+
+    @ManyToMany
+    @JoinTable(
+            name = "wishes_to_wishlists",
+            joinColumns = @JoinColumn(name = "wish_id"),
+            inverseJoinColumns = @JoinColumn(name = "wishlist_id")
+    )
+    private List<Wishlist> wishlists;
 
 }

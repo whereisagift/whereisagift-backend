@@ -24,7 +24,7 @@ public class Wishlist {
     @JoinColumn(name = "creator_id")
     private User creator;
 
-    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "wishlists")
     private List<Wish> wishes;
 
 

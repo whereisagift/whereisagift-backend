@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @QueryMapping
-    public User userById(@Argument Long id) {
+    public User user(@Argument Long id) {
         return userRepository.findById(id).orElse(null);
     }
 

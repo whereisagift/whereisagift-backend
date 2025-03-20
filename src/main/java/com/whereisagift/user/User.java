@@ -1,5 +1,6 @@
 package com.whereisagift.user;
 
+import com.whereisagift.wish.Wish;
 import com.whereisagift.wishlist.Wishlist;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -24,9 +25,11 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Wishlist> wishlists;
+//    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Wishlist> wishlists;
 
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wish> wishes;
 }
 
 

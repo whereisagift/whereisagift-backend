@@ -23,7 +23,7 @@ public class WishlistController {
     }
 
     @QueryMapping
-    public Wishlist wishlistById(@Argument Long id) {
+    public Wishlist wishlist(@Argument Long id) {
         return wishlistRepository.findById(id).orElse(null);
     }
 
@@ -38,6 +38,7 @@ public class WishlistController {
         wishlist.setName(name);
         User user = userRepository.findById(1L).orElse(null);
         wishlist.setCreator(user);
+
         return wishlistRepository.save(wishlist);
     }
 
