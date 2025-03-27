@@ -22,8 +22,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(min = 3, max = 50)
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "telegram_id", nullable = false)
+    private Long telegram_id;
+    @Column(name = "first_name", nullable = false)
+    private String first_name;
+    @Column(name = "last_name", nullable = false)
+    private String last_name;
+    @Column(name = "telegram_username", nullable = false)
+    private String telegram_username;
+    @Column(name = "photo_url")
+    private String photo_url;
 
 //    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private List<Wishlist> wishlists;
