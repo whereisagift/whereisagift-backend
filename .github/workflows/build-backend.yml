@@ -1,0 +1,40 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission to Gradle wrapper
+        run: chmod +x gradlew
+
+      - name: Build JAR
+        run: ./gradlew build
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/your-org/whereisagift-backend:${{ github.sha }} .
+          docker tag ghcr.io/your-org/whereisagift-backend:${{ github.sha }} ghcr.io/your-org/whereisagift-backend:latest
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/your-org/whereisagift-backend:${{ github.sha }}
+          docker push ghcr.io/your-org/whereisagift-backend:latest
