@@ -1,23 +1,16 @@
-# Stage 1: Build
-FROM gradle:7.5.1-jdk17 AS build
-
-WORKDIR /app
-
-COPY ../gradlew ../build.gradle.kts ./
-COPY ../gradle ./gradle
-COPY ../src ./src
-
-RUN gradle build -x test
-
-# Stage 2: Create the runtime image
+# Stage 1: Create the runtime image
 FROM openjdk:17-jdk-slim AS runtime
 
 WORKDIR /app
 
-COPY --from=build /app/build/libs/your-app.jar ./app.jar
+# Копируем собранный JAR файл в контейнер
+COPY build/libs/*.jar ./app.jar
 
+# Устанавливаем переменные окружения (по желанию)
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
+# Открываем порт, на котором будет работать приложение
 EXPOSE 8080
 
+# Запускаем Java приложение
 CMD ["java", "-jar", "/app/app.jar"]

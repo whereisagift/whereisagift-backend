@@ -21,13 +21,21 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
       - name: Build and Push Docker Image
         run: |
           IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
           TAG=${{ github.sha }}
           BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
 
-          docker build -f ./deploy/Dockerfile --build-arg JAR_FILE=build/libs/your-app.jar -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
+          docker build -f ./deploy/Dockerfile -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
 
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
