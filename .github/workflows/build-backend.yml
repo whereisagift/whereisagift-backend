@@ -65,7 +65,6 @@ jobs:
             DOCKER_COMPOSE_PATH="./develop/backend/compose.yml"
           fi
           
-          # Обновляем compose.yml, заменяя версию образа
           sed -i "s|image: ghcr.io/whereisagift/whereisagift-backend:[^ ]*|image: ghcr.io/whereisagift/whereisagift-backend:${{ github.sha }}|" "$DOCKER_COMPOSE_PATH"
           
           git config --global user.name "GitHub Actions"
