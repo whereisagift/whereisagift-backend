@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Копируем Gradle кеш и wrapper в контейнер
 COPY --chown=gradle:gradle ../.gradle ./.gradle
-COPY --chown=gradle:gradle ../gradlew ../build.gradle.kts settings.gradle ./
+COPY --chown=gradle:gradle ../gradlew ../build.gradle.kts ./
 
 # Копируем исходники
 COPY --chown=gradle:gradle ../src ./src
