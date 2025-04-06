@@ -3,9 +3,12 @@ FROM gradle:7.5.1-jdk17 AS build
 
 WORKDIR /app
 
-COPY ../gradle ./gradle
-COPY ../gradlew ../build.gradle.kts ./
-COPY ../src ./src
+# Копируем Gradle кеш и wrapper в контейнер
+COPY --chown=gradle:gradle ../.gradle ./.gradle
+COPY --chown=gradle:gradle ../gradlew ../build.gradle.kts settings.gradle ./
+
+# Копируем исходники
+COPY --chown=gradle:gradle ../src ./src
 
 # Build the project and generate the JAR file
 RUN gradle build -x test
