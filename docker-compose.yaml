@@ -5,7 +5,7 @@ services:
       - spring-boot-postgres-network
     build:
       context: ./  # Контекст сборки — корневая папка проекта
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     env_file:
       - .env
     depends_on:
@@ -17,7 +17,7 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: ["./gradlew", "bootRun"]
+    command: [ "./gradlew", "bootRun" ]
 
   db:
     container_name: postgres-container
@@ -32,7 +32,7 @@ services:
     networks:
       - spring-boot-postgres-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
       interval: 10s
       retries: 5
       start_period: 5s

@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Java to GHCR
 
 on:
   push:
@@ -6,35 +6,58 @@ on:
       - main
       - develop
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
+  packages: write
 
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'develop' }}
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
+          TAG=${{ github.sha }}
+          BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
+
+          docker build -f ./deploy/Dockerfile --build-arg JAR_FILE=build/libs/your-app.jar -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
+
+          docker push $IMAGE_NAME:$TAG
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:$BRANCH_TAG
+
+  deploy:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout whereisagift-devops repository
+        uses: actions/checkout@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          repository: whereisagift/whereisagift-devops
+          token: ${{ secrets.DEPLOY_TOKEN }}
 
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x gradlew
-
-      - name: Build JAR
-        run: ./gradlew build
-
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-
-      - name: Build Docker image
+      - name: Update backend version in whereisagift-devops
         run: |
-          docker build -t ghcr.io/your-org/whereisagift-backend:${{ github.sha }} .
-          docker tag ghcr.io/your-org/whereisagift-backend:${{ github.sha }} ghcr.io/your-org/whereisagift-backend:latest
-
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/your-org/whereisagift-backend:${{ github.sha }}
-          docker push ghcr.io/your-org/whereisagift-backend:latest
+          BRANCH_NAME=${{ github.ref_name }}
+          
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            DOCKER_COMPOSE_PATH="./production/backend/compose.yml"
+          else
+            DOCKER_COMPOSE_PATH="./develop/backend/compose.yml"
+          fi
+          
+          # Обновляем compose.yml, заменяя версию образа
+          sed -i "s|image: ghcr.io/whereisagift/whereisagift-backend:[^ ]*|image: ghcr.io/whereisagift/whereisagift-backend:${{ github.sha }}|" "$DOCKER_COMPOSE_PATH"
+          
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add "$DOCKER_COMPOSE_PATH"
+          git commit -m "Update backend image version in $DOCKER_COMPOSE_PATH to ${{ github.sha }}"
+          git push
