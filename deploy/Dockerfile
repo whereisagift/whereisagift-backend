@@ -4,7 +4,7 @@ FROM gradle:7.5.1-jdk17 AS build
 WORKDIR /app
 
 # Copy Gradle files and project source code
-COPY build.gradle settings.gradle ./
+COPY ../build.gradle ../settings.gradle ./
 COPY ../src ./src
 
 # Build the project and generate the JAR file
