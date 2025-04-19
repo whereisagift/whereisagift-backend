@@ -23,11 +23,15 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
-          TAG=${{ github.sha }}
-          BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
+          export IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
+          export TAG=${{ github.sha }}
+          export BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
 
-          docker build -f ./deploy/Dockerfile --build-arg SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
+          docker build -f ./deploy/Dockerfile \
+            --build-arg SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
+            -t $IMAGE_NAME:$TAG \
+            -t $IMAGE_NAME:latest \
+            -t $IMAGE_NAME:$BRANCH_TAG .
 
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
@@ -46,15 +50,15 @@ jobs:
       - name: Update backend version in whereisagift-devops
         run: |
           BRANCH_NAME=${{ github.ref_name }}
-          
+
           if [[ "$BRANCH_NAME" == "main" ]]; then
             DOCKER_COMPOSE_PATH="./production/backend/compose.yml"
           else
             DOCKER_COMPOSE_PATH="./develop/backend/compose.yml"
           fi
-          
+
           sed -i "s|image: ghcr.io/whereisagift/whereisagift-backend:[^ ]*|image: ghcr.io/whereisagift/whereisagift-backend:${{ github.sha }}|" "$DOCKER_COMPOSE_PATH"
-          
+
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add "$DOCKER_COMPOSE_PATH"
