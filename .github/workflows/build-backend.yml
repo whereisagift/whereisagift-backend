@@ -25,7 +25,11 @@ jobs:
         run: |
           IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
           TAG=${{ github.sha }}
-          BRANCH_TAG=$( [ "${{ github.ref_name }}" = "main" ] && echo "production" || echo "develop" )
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            BRANCH_TAG="production"
+          else
+            BRANCH_TAG="develop"
+          fi
 
           docker build -f ./deploy/Dockerfile \
             --build-arg SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
