@@ -25,18 +25,12 @@ jobs:
         run: |
           IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
           TAG=${{ github.sha }}
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            BRANCH_TAG="production"
-          else
-            BRANCH_TAG="develop"
-          fi
+          BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
 
-          docker build -f ./deploy/Dockerfile \
-            --build-arg SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
-            -t $IMAGE_NAME:$TAG \
-            -t $IMAGE_NAME:latest \
-            -t $IMAGE_NAME:$BRANCH_TAG .
+          # Build the Docker image with the necessary tags (SHA, latest, production/develop)
+          docker build -f ./deploy/Dockerfile --build-arg SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}" -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
 
+          # Push the Docker images with the tags
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:$BRANCH_TAG
@@ -51,18 +45,19 @@ jobs:
           repository: whereisagift/whereisagift-devops
           token: ${{ secrets.DEPLOY_TOKEN }}
 
-      - name: Update backend version in whereisagift-devops
+      - name: Update frontend version in whereisagift-devops
         run: |
           BRANCH_NAME=${{ github.ref_name }}
-
+          
           if [[ "$BRANCH_NAME" == "main" ]]; then
             DOCKER_COMPOSE_PATH="./production/backend/compose.yml"
           else
             DOCKER_COMPOSE_PATH="./develop/backend/compose.yml"
           fi
-
+          
+          # Обновляем compose.yml, заменяя версию образа
           sed -i "s|image: ghcr.io/whereisagift/whereisagift-backend:[^ ]*|image: ghcr.io/whereisagift/whereisagift-backend:${{ github.sha }}|" "$DOCKER_COMPOSE_PATH"
-
+          
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add "$DOCKER_COMPOSE_PATH"
