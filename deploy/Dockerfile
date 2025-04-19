@@ -8,9 +8,10 @@ COPY gradlew settings.gradle.kts build.gradle.kts ./
 COPY src ./src
 
 ARG SPRING_DATASOURCE_URL
-ENV SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL
 ARG SERVER_PORT
-ENV SERVER_PORT=$SERVER_PORT
+
+ENV SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+ENV SERVER_PORT=${SERVER_PORT}
 
 RUN chmod +x ./gradlew && ./gradlew clean build -x test
 
@@ -23,6 +24,10 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
-EXPOSE 8080
+ENV SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+ENV SERVER_PORT=${SERVER_PORT}
 
-CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+EXPOSE 3000
+
+# Используем ENTRYPOINT для запуска приложения с переменными окружения
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
