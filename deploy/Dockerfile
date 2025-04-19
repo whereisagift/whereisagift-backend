@@ -7,6 +7,9 @@ COPY gradle gradle
 COPY gradlew settings.gradle.kts build.gradle.kts ./
 COPY src ./src
 
+ARG SPRING_DATASOURCE_URL
+ENV SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL
+
 RUN chmod +x ./gradlew && ./gradlew clean build -x test
 
 # Stage 1: Runtime

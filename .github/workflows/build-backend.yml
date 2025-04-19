@@ -27,7 +27,7 @@ jobs:
           TAG=${{ github.sha }}
           BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
 
-          docker build -f ./deploy/Dockerfile -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
+          docker build -f ./deploy/Dockerfile --build-arg SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
 
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
