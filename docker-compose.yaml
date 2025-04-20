@@ -5,7 +5,6 @@ services:
       - spring-boot-postgres-network
     build:
       context: ./  # Контекст сборки — корневая папка проекта
-      dockerfile: deploy/Dockerfile
     env_file:
       - .env
     #    depends_on:

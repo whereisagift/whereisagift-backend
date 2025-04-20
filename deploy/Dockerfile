@@ -7,12 +7,6 @@ COPY gradle gradle
 COPY gradlew settings.gradle.kts build.gradle.kts ./
 COPY src ./src
 
-ARG SPRING_DATASOURCE_URL
-ARG SERVER_PORT
-
-ENV SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-ENV SERVER_PORT=${SERVER_PORT}
-
 RUN chmod +x ./gradlew && ./gradlew clean build -x test
 
 # Stage 1: Runtime
@@ -23,9 +17,6 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
-
-ENV SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-ENV SERVER_PORT=${SERVER_PORT}
 
 EXPOSE 3000
 

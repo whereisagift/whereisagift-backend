@@ -21,6 +21,11 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
+      - name: Generate application.properties
+        run: |
+          echo "spring.datasource.url=${{ secrets.SPRING_DATASOURCE_URL }}" >> src/main/resources/application.properties
+          echo "server.port=${{ secrets.SERVER_PORT }}" >> src/main/resources/application.properties
+
       - name: Build and Push Docker Image
         run: |
           IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
@@ -29,8 +34,6 @@ jobs:
 
           # Build the Docker image with the necessary tags (SHA, latest, production/develop)
           docker build -f ./deploy/Dockerfile \
-            --build-arg SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}" \
-            --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
             -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
 
           # Push the Docker images with the tags
