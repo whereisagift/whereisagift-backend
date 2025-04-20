@@ -10,13 +10,13 @@ COPY src ./src
 RUN chmod +x ./gradlew && ./gradlew clean build -x test
 
 # Stage 1: Runtime
-FROM eclipse-temurin:17-jdk-jammy as runtime
+FROM eclipse-temurin:17-jre-alpine as runtime
 
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-ENV JAVA_OPTS="-Xms512m -Xmx1024m"
+ENV JAVA_OPTS="-Xms128m -Xmx512m -XX:+UseSerialGC"
 
 EXPOSE 3000
 
