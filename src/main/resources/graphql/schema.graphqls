@@ -1,6 +1,10 @@
 type User {
     id: ID!
-    name: String!
+    telegramId: String!
+    username: String!
+    firstName: String!
+    lastName: String!
+    photoUrl: String!
     wishlists: [Wishlist]
     wishes: [Wish]
 }
@@ -16,7 +20,12 @@ type Wish {
     id: ID!
     name: String!
     creator: User!
-    wishlist: Wishlist
+    wishlists: [Wishlist]
+}
+
+type AuthPayload {
+    token: String!
+    user: User!
 }
 
 type Query {
@@ -27,8 +36,16 @@ type Query {
 }
 
 type Mutation {
-    createUser(name: String!): User
+    createUser(telegramId: String!, firstName: String!, lastName: String!, username: String!, photoUrl: String!): User
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
+    login(
+        telegramId: String!
+        firstName: String!
+        lastName: String!
+        username: String!
+        photoUrl: String!
+        authDate: String!
+    ): AuthPayload
 }
 

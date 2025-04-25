@@ -23,11 +23,6 @@ public class WishlistController {
     }
 
     @QueryMapping
-    public Wishlist wishlist(@Argument Long id) {
-        return wishlistRepository.findById(id).orElse(null);
-    }
-
-    @QueryMapping
     public Iterable<Wishlist> wishlists() {
         return wishlistRepository.findAll();
     }
