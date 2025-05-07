@@ -22,6 +22,9 @@ public class SecurityConfig {
                         .requestMatchers("/graphql").permitAll()
                         .anyRequest().denyAll()
                 );
+
+
+
         return httpSecurity.build();
     }
 

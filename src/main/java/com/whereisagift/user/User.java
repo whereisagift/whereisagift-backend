@@ -42,4 +42,3 @@ public class User {
     private List<Wish> wishes;
 }
 
-

@@ -53,28 +53,11 @@ public class AuthController {
             @Argument String username,
             @Argument String photoUrl,
             @Argument String authDate,
+            @Argument String hash,
             GraphQLContext context) {
 
-        Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put("telegramId", telegramId);
-        params.put("firstName", firstName);
-        params.put("lastName", lastName);
-        params.put("username", username);
-        params.put("photoUrl", photoUrl);
-        params.put("authDate", authDate);
-
-        String dataString = params.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.joining("\n"));
-
-        String hashCalculatedFromTg = new HmacUtils("HmacSHA256", dotenv.get("TELEGRAM_BOT_TOKEN").getBytes())
-                .hmacHex(dataString.getBytes());
-
-        log.debug("hash from tg: {}\ndataString: {}", hashCalculatedFromTg, dataString);
-
         if (!validateTelegramHash(telegramId, firstName, lastName, username,
-                photoUrl, authDate, hashCalculatedFromTg)) throw new GraphQLException("Invalid Telegram hash");
+                photoUrl, authDate, hash)) throw new GraphQLException("Invalid Telegram hash");
 
 //        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
 
@@ -115,13 +98,13 @@ public class AuthController {
     }
 
     private boolean validateTelegramHash(String telegramId, String firstName, String lastName,
-                                         String username, String photoUrl, String authDate, String hashCalculatedFromTg) {
+                                         String username, String photoUrl, String authDate, String hash) {
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put("telegramId", telegramId);
-        if (firstName != null) params.put("firstName", firstName);
-        if (lastName != null) params.put("lastName", lastName);
-        if (username != null) params.put("username", username);
-        if (photoUrl != null) params.put("photoUrl", photoUrl);
+        params.put("firstName", firstName);
+        params.put("lastName", lastName);
+        params.put("username", username);
+        params.put("photoUrl", photoUrl);
         params.put("authDate", authDate);
 
         String dataCheckString = params.entrySet().stream()
@@ -134,6 +117,6 @@ public class AuthController {
 
         log.debug("hash in check hash: {}\ndataCheckString: {}", calculatedHash, dataCheckString);
 
-        return calculatedHash.equals(hashCalculatedFromTg);
+        return calculatedHash.equals(hash);
     }
 }
