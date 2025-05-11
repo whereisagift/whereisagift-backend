@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 public class AuthPayload {
-    private String token;
     private User user;
 
-    public AuthPayload(String token, User user) {
-        this.token = token;
+    public AuthPayload(User user) {
         this.user = user;
     }
 }

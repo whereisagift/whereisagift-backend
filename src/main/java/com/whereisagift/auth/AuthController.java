@@ -38,12 +38,14 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    // чтобы получить доступ к .env
-    @Autowired
-    private Dotenv dotenv;
-
     @Autowired
     private JwtEncoder jwtEncoder;
+
+    @Value("${telegram.bot.token}")
+    private String telegramBotToken;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer.uri}")
+    private String issuerUri;
 
     @MutationMapping
     public AuthPayload login(
@@ -66,7 +68,7 @@ public class AuthController {
 
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .subject(String.valueOf(user.getId()))
-                .issuer(dotenv.get("SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI"))
+                .issuer(issuerUri)
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
                 .build();
@@ -87,7 +89,7 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return new AuthPayload(token, user);
+        return new AuthPayload(user);
     }
 
     private boolean validateTelegramHash(AuthData authData) {
@@ -104,7 +106,7 @@ public class AuthController {
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining("\n"));
 
-        String calculatedHash = new HmacUtils("HmacSHA256", dotenv.get("TELEGRAM_BOT_TOKEN").getBytes())
+        String calculatedHash = new HmacUtils("HmacSHA256", telegramBotToken.getBytes())
                 .hmacHex(dataCheckString.getBytes());
 
         log.debug("hash in check hash: {}\ndataCheckString: {}", calculatedHash, dataCheckString);
