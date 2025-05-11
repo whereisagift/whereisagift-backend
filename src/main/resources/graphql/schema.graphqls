@@ -24,8 +24,17 @@ type Wish {
 }
 
 type AuthPayload {
-    token: String!
     user: User!
+}
+
+type AuthData {
+    telegramId: String!
+    firstName: String!
+    lastName: String!
+    username: String!
+    photoUrl: String!
+    authDate: String!
+    hash: String!
 }
 
 type Query {
@@ -40,12 +49,7 @@ type Mutation {
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
     login(
-        telegramId: String!
-        firstName: String!
-        lastName: String!
-        username: String!
-        photoUrl: String!
-        authDate: String!
+        authData: AuthData!
     ): AuthPayload
 }
 

@@ -47,27 +47,20 @@ public class AuthController {
 
     @MutationMapping
     public AuthPayload login(
-            @Argument String telegramId,
-            @Argument String firstName,
-            @Argument String lastName,
-            @Argument String username,
-            @Argument String photoUrl,
-            @Argument String authDate,
-            @Argument String hash,
+            @Argument AuthData authData,
             GraphQLContext context) {
 
-        if (!validateTelegramHash(telegramId, firstName, lastName, username,
-                photoUrl, authDate, hash)) throw new GraphQLException("Invalid Telegram hash");
+        if (!validateTelegramHash(authData)) throw new GraphQLException("Invalid Telegram hash");
 
 //        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
 
-        User user = userRepository.findByTelegramId(Long.parseLong(telegramId)).orElseGet(() -> {
+        User user = userRepository.findByTelegramId(Long.parseLong(authData.getTelegramId())).orElseGet(() -> {
             User newUser = new User();
-            newUser.setTelegramId(Long.parseLong(telegramId));
-            newUser.setFirstName(firstName);
-            newUser.setLastName(lastName);
-            newUser.setUsername(username);
-            newUser.setPhotoUrl(photoUrl);
+            newUser.setTelegramId(Long.parseLong(authData.getTelegramId()));
+            newUser.setFirstName(authData.getFirstName());
+            newUser.setLastName(authData.getLastName());
+            newUser.setUsername(authData.getUsername());
+            newUser.setPhotoUrl(authData.getPhotoUrl());
             return userRepository.save(newUser);
         });
 
@@ -97,15 +90,14 @@ public class AuthController {
         return new AuthPayload(token, user);
     }
 
-    private boolean validateTelegramHash(String telegramId, String firstName, String lastName,
-                                         String username, String photoUrl, String authDate, String hash) {
+    private boolean validateTelegramHash(AuthData authData) {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put("telegramId", telegramId);
-        params.put("firstName", firstName);
-        params.put("lastName", lastName);
-        params.put("username", username);
-        params.put("photoUrl", photoUrl);
-        params.put("authDate", authDate);
+        params.put("telegramId", authData.getTelegramId());
+        params.put("firstName", authData.getFirstName());
+        params.put("lastName", authData.getLastName());
+        params.put("username", authData.getUsername());
+        params.put("photoUrl", authData.getPhotoUrl());
+        params.put("authDate", authData.getAuthDate());
 
         String dataCheckString = params.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -117,6 +109,6 @@ public class AuthController {
 
         log.debug("hash in check hash: {}\ndataCheckString: {}", calculatedHash, dataCheckString);
 
-        return calculatedHash.equals(hash);
+        return calculatedHash.equals(authData.getHash());
     }
 }
