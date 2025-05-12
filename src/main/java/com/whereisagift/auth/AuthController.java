@@ -4,15 +4,12 @@ import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
 import graphql.GraphQLContext;
 import graphql.GraphQLException;
-import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,14 +17,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -48,21 +43,21 @@ public class AuthController {
     private String issuerUri;
 
     @MutationMapping
-    public AuthPayload login(
-            @Argument AuthData authData,
+    public User login(
+            @Argument AuthPayload authPayload,
             GraphQLContext context) {
 
-        if (!validateTelegramHash(authData)) throw new GraphQLException("Invalid Telegram hash");
+        if (!validateTelegramHash(authPayload)) throw new GraphQLException("Invalid Telegram hash");
 
 //        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
 
-        User user = userRepository.findByTelegramId(Long.parseLong(authData.getTelegramId())).orElseGet(() -> {
+        User user = userRepository.findByTelegramId(Long.parseLong(authPayload.getTelegramId())).orElseGet(() -> {
             User newUser = new User();
-            newUser.setTelegramId(Long.parseLong(authData.getTelegramId()));
-            newUser.setFirstName(authData.getFirstName());
-            newUser.setLastName(authData.getLastName());
-            newUser.setUsername(authData.getUsername());
-            newUser.setPhotoUrl(authData.getPhotoUrl());
+            newUser.setTelegramId(Long.parseLong(authPayload.getTelegramId()));
+            newUser.setFirstName(authPayload.getFirstName());
+            newUser.setLastName(authPayload.getLastName());
+            newUser.setUsername(authPayload.getUsername());
+            newUser.setPhotoUrl(authPayload.getPhotoUrl());
             return userRepository.save(newUser);
         });
 
@@ -89,17 +84,17 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return new AuthPayload(user);
+        return user;
     }
 
-    private boolean validateTelegramHash(AuthData authData) {
+    private boolean validateTelegramHash(AuthPayload authPayload) {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put("telegramId", authData.getTelegramId());
-        params.put("firstName", authData.getFirstName());
-        params.put("lastName", authData.getLastName());
-        params.put("username", authData.getUsername());
-        params.put("photoUrl", authData.getPhotoUrl());
-        params.put("authDate", authData.getAuthDate());
+        params.put("telegramId", authPayload.getTelegramId());
+        params.put("firstName", authPayload.getFirstName());
+        params.put("lastName", authPayload.getLastName());
+        params.put("username", authPayload.getUsername());
+        params.put("photoUrl", authPayload.getPhotoUrl());
+        params.put("authDate", authPayload.getAuthDate());
 
         String dataCheckString = params.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -111,6 +106,6 @@ public class AuthController {
 
         log.debug("hash in check hash: {}\ndataCheckString: {}", calculatedHash, dataCheckString);
 
-        return calculatedHash.equals(authData.getHash());
+        return calculatedHash.equals(authPayload.getHash());
     }
 }

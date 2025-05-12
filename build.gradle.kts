@@ -28,8 +28,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    // https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java
-    implementation("io.github.cdimascio:dotenv-java:3.2.0")
     implementation("commons-codec:commons-codec")
     implementation ("org.springframework.boot:spring-boot-starter-security")
     implementation ("org.springframework.boot:spring-boot-starter-oauth2-resource-server")

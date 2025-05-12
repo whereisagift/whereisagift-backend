@@ -24,10 +24,6 @@ type Wish {
 }
 
 type AuthPayload {
-    user: User!
-}
-
-type AuthData {
     telegramId: String!
     firstName: String!
     lastName: String!
@@ -49,7 +45,7 @@ type Mutation {
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
     login(
-        authData: AuthData!
-    ): AuthPayload
+        authPayload: AuthPayload!
+    ): User
 }
 
