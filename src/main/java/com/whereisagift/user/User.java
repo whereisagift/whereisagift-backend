@@ -22,14 +22,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(min = 3, max = 50)
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "telegram_id", nullable = false)
+    private Long telegramId;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+    @Column(name = "telegram_username", nullable = false)
+    private String username;
+    @Column(name = "photo_url")
+    private String photoUrl;
+    @Column(name = "auth_date", nullable = false)
+    private Long authDate;
 
-//    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Wishlist> wishlists;
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wishlist> wishlists;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Wish> wishes;
 }
-
 

@@ -30,9 +30,15 @@ public class UserController {
 
 
     @MutationMapping
-    public User createUser(@Argument String name) {
+    public User createUser(@Argument Long telegramId, @Argument String firstName,
+                           @Argument String lastName, @Argument String username,
+                           @Argument String photoUrl) {
         User user = new User();
-        user.setName(name);
+        user.setTelegramId(telegramId);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setPhotoUrl(photoUrl);
         return userRepository.save(user);
     }
 }
