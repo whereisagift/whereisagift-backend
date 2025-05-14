@@ -19,8 +19,23 @@ type Wishlist {
 type Wish {
     id: ID!
     name: String!
+    url: String!
+    pictureUrl: String
+    booking: Booking
     creator: User!
     wishlists: [Wishlist]
+    orderDate: String
+    price: String
+}
+
+type Booking {
+    reservist: Reservist!
+    date: String!
+}
+
+type Reservist {
+    id: String!
+    nickname: String!
 }
 
 type AuthPayload {
