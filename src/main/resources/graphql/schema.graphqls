@@ -23,7 +23,7 @@ type Wish {
     wishlists: [Wishlist]
 }
 
-type AuthPayload {
+input AuthPayload {
     telegramId: String!
     firstName: String!
     lastName: String!
@@ -41,7 +41,6 @@ type Query {
 }
 
 type Mutation {
-    createUser(telegramId: String!, firstName: String!, lastName: String!, username: String!, photoUrl: String!): User
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
     login(
