@@ -25,6 +25,9 @@ jobs:
         run: |
           echo "spring.datasource.url=${{ secrets.SPRING_DATASOURCE_URL }}" >> src/main/resources/application.properties
           echo "server.port=${{ secrets.SERVER_PORT }}" >> src/main/resources/application.properties
+          echo "spring.security.oauth2.resourceserver.jwt.issuer.uri=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}" >> src/main/resources/application.properties
+          echo "telegram.bot.token=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> src/main/resources/application.properties
+          echo "jwt.secret=${{ secrets.JWT_SECRET }}" >> src/main/resources/application.properties
 
       - name: Build and Push Docker Image
         run: |
