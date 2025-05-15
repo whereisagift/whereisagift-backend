@@ -38,7 +38,7 @@ type Reservist {
     nickname: String!
 }
 
-type AuthPayload {
+input AuthPayload {
     telegramId: String!
     firstName: String!
     lastName: String!
@@ -62,5 +62,6 @@ type Mutation {
     login(
         authPayload: AuthPayload!
     ): User
+    bookingWish(telegramId: Int!, wishId: Int!): Booking!
 }
 
