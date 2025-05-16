@@ -1,18 +1,16 @@
 package com.whereisagift.auth;
 
-import lombok.Getter;
+import lombok.Data;
 
 
+@Data
 public class AuthPayload {
     private Integer id;
     private String first_name;
     private String last_name;
     private String photo_url;
     private Integer auth_date;
-
-    @Getter
     private String hash;
-    @Getter
     private String username;
 
     public Integer getTelegramId() {
