@@ -88,13 +88,13 @@ public class AuthController {
     }
 
     private boolean validateTelegramHash(AuthPayload authPayload) {
-        Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put("telegramId", authPayload.getTelegramId().toString());
-        params.put("firstName", authPayload.getFirstName());
-        params.put("lastName", authPayload.getLastName());
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("auth_date", authPayload.getAuthDate().toString());
+        params.put("first_name", authPayload.getFirstName());
+        params.put("id", authPayload.getTelegramId().toString());
+        params.put("last_name", authPayload.getLastName());
+        params.put("photo_url", authPayload.getPhotoUrl());
         params.put("username", authPayload.getUsername());
-        params.put("photoUrl", authPayload.getPhotoUrl());
-        params.put("authDate", authPayload.getAuthDate().toString());
 
         String dataCheckString = params.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -108,4 +108,5 @@ public class AuthController {
 
         return calculatedHash.equals(authPayload.getHash());
     }
+
 }
