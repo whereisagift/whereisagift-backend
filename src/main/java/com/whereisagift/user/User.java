@@ -3,12 +3,10 @@ package com.whereisagift.user;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wishlist.Wishlist;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CollectionIdMutability;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,7 +19,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(min = 3, max = 50)
+    @Min(1)
     @Column(name = "telegram_id", nullable = false)
     private Long telegramId;
     @Column(name = "first_name", nullable = false)
