@@ -1,3 +1,4 @@
+// src/main/java/com/whereisagift/auth/AuthController.java
 package com.whereisagift.auth;
 
 import com.whereisagift.user.User;
@@ -13,7 +14,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -27,45 +27,46 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @RestController
 public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private JwtEncoder jwtEncoder;
 
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
-
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer.uri}")
     private String issuerUri;
 
     @MutationMapping
-    public User login(
-            @Argument AuthPayload authPayload,
-            GraphQLContext context) {
+    public User login(@Argument AuthPayload authPayload, GraphQLContext context) {
+        if (!validateTelegramHash(authPayload)) {
+            throw new GraphQLException("Invalid Telegram hash");
+        }
 
-        if (!validateTelegramHash(authPayload)) throw new GraphQLException("Invalid Telegram hash");
+        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue())
+                .orElseGet(() -> userRepository.save(toUser(authPayload)));
 
-//        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
+        String token = createJwtForUser(user);
+        setCookie(context, token);
 
-        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue()).orElseGet(() -> userRepository.save(toUser(authPayload)));
+        return user;
+    }
 
-        JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+    private String createJwtForUser(User user) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(String.valueOf(user.getId()))
                 .issuer(issuerUri)
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
                 .build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
 
-        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claimsSet));
-
-        String token = jwt.getTokenValue();
-
+    private void setCookie(GraphQLContext ctx, String token) {
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .secure(true)
@@ -73,12 +74,8 @@ public class AuthController {
                 .maxAge(3600)
                 .sameSite("Strict")
                 .build();
-
-        HttpServletResponse response = context.get(HttpServletResponse.class);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return user;
+        HttpServletResponse res = ctx.get(HttpServletResponse.class);
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private User toUser(AuthPayload payload) {
@@ -92,17 +89,17 @@ public class AuthController {
         return user;
     }
 
-    private boolean validateTelegramHash(AuthPayload authPayload) {
+    private boolean validateTelegramHash(AuthPayload payload) {
         try {
-            Map<String, String> params = new LinkedHashMap<>();
-            params.put("auth_date", authPayload.getAuthDate().toString());
-            params.put("first_name", authPayload.getFirstName());
-            params.put("id", authPayload.getTelegramId().toString());
-            params.put("last_name", authPayload.getLastName());
-            params.put("photo_url", authPayload.getPhotoUrl());
-            params.put("username", authPayload.getUsername());
+            Map<String, String> hashMap = new LinkedHashMap<>();
+            hashMap.put("auth_date", payload.getAuthDate().toString());
+            hashMap.put("first_name", payload.getFirstName());
+            hashMap.put("id", payload.getTelegramId().toString());
+            hashMap.put("last_name", payload.getLastName());
+            hashMap.put("photo_url", payload.getPhotoUrl());
+            hashMap.put("username", payload.getUsername());
 
-            String dataCheckString = params.entrySet().stream()
+            String dataCheck = hashMap.entrySet().stream()
                     .sorted(Map.Entry.comparingByKey())
                     .map(entry -> entry.getKey() + "=" + entry.getValue())
                     .collect(Collectors.joining("\n"));
@@ -110,19 +107,16 @@ public class AuthController {
             byte[] key = MessageDigest.getInstance("SHA-256")
                     .digest(telegramBotToken.getBytes(StandardCharsets.UTF_8));
 
-            String calculatedHash = new HmacUtils("HmacSHA256", key)
-                    .hmacHex(dataCheckString.getBytes(StandardCharsets.UTF_8));
+            String expected = new HmacUtils("HmacSHA256", key)
+                    .hmacHex(dataCheck.getBytes(StandardCharsets.UTF_8));
 
-            log.debug("dataCheckString:\n{}", dataCheckString);
-            log.debug("expectedHash: {}", calculatedHash);
-            log.debug("providedHash: {}", authPayload.getHash());
+            log.debug("dataCheck:\n{}\nexpectedHash: {}\nprovidedHash: {}",
+                    dataCheck, expected, payload.getHash());
 
-            return calculatedHash.equals(authPayload.getHash());
-        } catch (Exception e) {
-            log.error("Error validating Telegram hash", e);
+            return expected.equals(payload.getHash());
+        } catch (Exception ex) {
+            log.error("Error validating Telegram hash", ex);
             return false;
         }
     }
-
-
 }

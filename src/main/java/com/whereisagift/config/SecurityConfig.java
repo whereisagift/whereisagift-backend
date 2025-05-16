@@ -1,30 +1,43 @@
+// src/main/java/com/whereisagift/config/SecurityConfig.java
 package com.whereisagift.config;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+        http
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/graphql", "/graphiql", "/vendor/**", "/playground", "/graphiql/**").permitAll()
-                        .anyRequest().denyAll()
+                        .requestMatchers("/graphql", "/graphiql", "/vendor/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+
+                .oauth2ResourceServer(oauth -> oauth
+                        .bearerTokenResolver(cookieBearerTokenResolver())
+                        .jwt(jwt -> jwt.decoder(jwtDecoder))
                 );
-
-
-        return httpSecurity.build();
+        return http.build();
     }
 
+    private BearerTokenResolver cookieBearerTokenResolver() {
+        return request -> {
+            if (request.getCookies() == null) return null;
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+            return null;
+        };
+    }
 }
