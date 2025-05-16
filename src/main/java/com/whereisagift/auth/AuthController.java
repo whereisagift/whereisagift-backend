@@ -53,15 +53,7 @@ public class AuthController {
 
 //        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
 
-        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue()).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setTelegramId(authPayload.getTelegramId().longValue());
-            newUser.setFirstName(authPayload.getFirstName());
-            newUser.setLastName(authPayload.getLastName());
-            newUser.setUsername(authPayload.getUsername());
-            newUser.setPhotoUrl(authPayload.getPhotoUrl());
-            return userRepository.save(newUser);
-        });
+        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue()).orElseGet(() -> userRepository.save(toUser(authPayload)));
 
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .subject(String.valueOf(user.getId()))
@@ -86,6 +78,17 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        return user;
+    }
+
+    private User toUser(AuthPayload payload) {
+        User user = new User();
+        user.setTelegramId(payload.getTelegramId().longValue());
+        user.setFirstName(payload.getFirstName());
+        user.setLastName(payload.getLastName());
+        user.setUsername(payload.getUsername());
+        user.setPhotoUrl(payload.getPhotoUrl());
+        user.setAuthDate(payload.getAuthDate().longValue());
         return user;
     }
 
