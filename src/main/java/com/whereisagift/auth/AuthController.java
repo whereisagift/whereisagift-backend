@@ -51,9 +51,9 @@ public class AuthController {
 
 //        if (System.currentTimeMillis()/1000 - Long.parseLong(authDate) > 86400) throw new GraphQLException("Auth data expired");
 
-        User user = userRepository.findByTelegramId(Long.parseLong(authPayload.getTelegramId())).orElseGet(() -> {
+        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue()).orElseGet(() -> {
             User newUser = new User();
-            newUser.setTelegramId(Long.parseLong(authPayload.getTelegramId()));
+            newUser.setTelegramId(authPayload.getTelegramId().longValue());
             newUser.setFirstName(authPayload.getFirstName());
             newUser.setLastName(authPayload.getLastName());
             newUser.setUsername(authPayload.getUsername());
@@ -89,12 +89,12 @@ public class AuthController {
 
     private boolean validateTelegramHash(AuthPayload authPayload) {
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put("telegramId", authPayload.getTelegramId());
+        params.put("telegramId", authPayload.getTelegramId().toString());
         params.put("firstName", authPayload.getFirstName());
         params.put("lastName", authPayload.getLastName());
         params.put("username", authPayload.getUsername());
         params.put("photoUrl", authPayload.getPhotoUrl());
-        params.put("authDate", authPayload.getAuthDate());
+        params.put("authDate", authPayload.getAuthDate().toString());
 
         String dataCheckString = params.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())

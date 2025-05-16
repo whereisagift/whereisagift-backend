@@ -1,17 +1,29 @@
 package com.whereisagift.auth;
 
-import com.whereisagift.user.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class AuthPayload {
 
-    private String telegramId;
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String photoUrl;
-    private String authDate;
-    private String hash;
+    @JsonProperty("id")
+    private Integer telegramId;
 
+    @JsonProperty("first_name")
+    private String firstName;
+
+    @JsonProperty("last_name")
+    private String lastName;
+
+    @JsonProperty("username")
+    private String username;
+
+    @JsonProperty("photo_url")
+    private String photoUrl;
+
+    @JsonProperty("auth_date")
+    private Integer authDate;
+
+    @JsonProperty("hash")
+    private String hash;
 }

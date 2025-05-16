@@ -13,31 +13,31 @@ type Wishlist {
     id: ID!
     name: String!
     creator: User!
-    wishes: [Wish]
+    wishes: [Wish!]
 }
 
 type Wish {
     id: ID!
     name: String!
     creator: User!
-    wishlists: [Wishlist]
+    wishlists: [Wishlist!]
 }
 
 input AuthPayload {
-    telegramId: String!
-    firstName: String!
-    lastName: String!
+    id: Int!
+    first_name: String!
+    last_name: String!
     username: String!
-    photoUrl: String!
-    authDate: String!
+    photo_url: String!
+    auth_date: Int!
     hash: String!
 }
 
 type Query {
     users: [User!]!
     user(id: ID!): User
-    wishlists: [Wishlist]
-    wishes: [Wish]
+    wishlists: [Wishlist!]
+    wishes: [Wish!]
 }
 
 type Mutation {
