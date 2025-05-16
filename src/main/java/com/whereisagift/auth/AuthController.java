@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
@@ -88,25 +90,36 @@ public class AuthController {
     }
 
     private boolean validateTelegramHash(AuthPayload authPayload) {
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("auth_date", authPayload.getAuthDate().toString());
-        params.put("first_name", authPayload.getFirstName());
-        params.put("id", authPayload.getTelegramId().toString());
-        params.put("last_name", authPayload.getLastName());
-        params.put("photo_url", authPayload.getPhotoUrl());
-        params.put("username", authPayload.getUsername());
+        try {
+            Map<String, String> params = new LinkedHashMap<>();
+            params.put("auth_date", authPayload.getAuthDate().toString());
+            params.put("first_name", authPayload.getFirstName());
+            params.put("id", authPayload.getTelegramId().toString());
+            params.put("last_name", authPayload.getLastName());
+            params.put("photo_url", authPayload.getPhotoUrl());
+            params.put("username", authPayload.getUsername());
 
-        String dataCheckString = params.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.joining("\n"));
+            String dataCheckString = params.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                    .collect(Collectors.joining("\n"));
 
-        String calculatedHash = new HmacUtils("HmacSHA256", telegramBotToken.getBytes())
-                .hmacHex(dataCheckString.getBytes());
+            byte[] key = MessageDigest.getInstance("SHA-256")
+                    .digest(telegramBotToken.getBytes(StandardCharsets.UTF_8));
 
-        log.debug("hash in check hash: {}\ndataCheckString: {}", calculatedHash, dataCheckString);
+            String calculatedHash = new HmacUtils("HmacSHA256", key)
+                    .hmacHex(dataCheckString.getBytes(StandardCharsets.UTF_8));
 
-        return calculatedHash.equals(authPayload.getHash());
+            log.debug("dataCheckString:\n{}", dataCheckString);
+            log.debug("expectedHash: {}", calculatedHash);
+            log.debug("providedHash: {}", authPayload.getHash());
+
+            return calculatedHash.equals(authPayload.getHash());
+        } catch (Exception e) {
+            log.error("Error validating Telegram hash", e);
+            return false;
+        }
     }
+
 
 }
