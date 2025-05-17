@@ -1,4 +1,3 @@
-// src/main/java/com/whereisagift/config/JwtConfig.java
 package com.whereisagift.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -25,7 +24,7 @@ public class JwtConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HS256");
+        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
         return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
 }

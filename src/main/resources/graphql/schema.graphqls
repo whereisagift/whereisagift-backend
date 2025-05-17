@@ -38,6 +38,7 @@ type Query {
     user(id: ID!): User
     wishlists: [Wishlist!]
     wishes: [Wish!]
+    me: User!
 }
 
 type Mutation {

@@ -1,4 +1,3 @@
-// src/main/java/com/whereisagift/auth/AuthController.java
 package com.whereisagift.auth;
 
 import com.whereisagift.user.User;
@@ -38,8 +37,6 @@ public class AuthController {
 
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer.uri}")
-    private String issuerUri;
 
     @MutationMapping
     public User login(@Argument AuthPayload authPayload, GraphQLContext context) {
@@ -58,12 +55,12 @@ public class AuthController {
 
     private String createJwtForUser(User user) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(String.valueOf(user.getId()))
-                .issuer(issuerUri)
+                .subject(user.getId().toString())
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
                 .build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims))
+                .getTokenValue();
     }
 
     private void setCookie(GraphQLContext ctx, String token) {
