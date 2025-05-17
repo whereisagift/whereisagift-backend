@@ -24,11 +24,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 public class AuthController {
+
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -48,6 +51,8 @@ public class AuthController {
                 .orElseGet(() -> userRepository.save(toUser(authPayload)));
 
         String token = createJwtForUser(user);
+
+        logger.info(" : " + token);
         setCookie(context, token);
 
         return user;
@@ -106,9 +111,6 @@ public class AuthController {
 
             String expected = new HmacUtils("HmacSHA256", key)
                     .hmacHex(dataCheck.getBytes(StandardCharsets.UTF_8));
-
-            log.debug("dataCheck:\n{}\nexpectedHash: {}\nprovidedHash: {}",
-                    dataCheck, expected, payload.getHash());
 
             return expected.equals(payload.getHash());
         } catch (Exception ex) {
