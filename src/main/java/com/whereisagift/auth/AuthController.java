@@ -2,7 +2,6 @@ package com.whereisagift.auth;
 
 import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
-import graphql.GraphQLContext;
 import graphql.GraphQLException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +12,13 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,14 +26,11 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 public class AuthController {
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -42,7 +41,7 @@ public class AuthController {
     private String telegramBotToken;
 
     @MutationMapping
-    public User login(@Argument AuthPayload authPayload, GraphQLContext context) {
+    public User login(@Argument AuthPayload authPayload) {
         if (!validateTelegramHash(authPayload)) {
             throw new GraphQLException("Invalid Telegram hash");
         }
@@ -52,8 +51,7 @@ public class AuthController {
 
         String token = createJwtForUser(user);
 
-        logger.info(" : " + token);
-        setCookie(context, token);
+        writeJwtCookie(token);
 
         return user;
     }
@@ -64,20 +62,36 @@ public class AuthController {
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
                 .build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims))
+
+        JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
+
+        return jwtEncoder
+                .encode(JwtEncoderParameters.from(jwsHeader, claims))
                 .getTokenValue();
     }
 
-    private void setCookie(GraphQLContext ctx, String token) {
+    private void writeJwtCookie(String token) {
+        // Grab the current servlet response
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) {
+            throw new IllegalStateException("No current request attributes");
+        }
+        HttpServletResponse response = attrs.getResponse();
+        if (response == null) {
+            throw new IllegalStateException("No current HTTP response");
+        }
+
+        // Build and set the HttpOnly cookie
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(true)
+                .secure(true)      // set false if you're testing over HTTP locally
                 .path("/")
                 .maxAge(3600)
                 .sameSite("Strict")
                 .build();
-        HttpServletResponse res = ctx.get(HttpServletResponse.class);
-        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private User toUser(AuthPayload payload) {

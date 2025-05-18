@@ -16,7 +16,13 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: [ "./gradlew", "bootRun" ]
+    tty: true
+    stdin_open: true
+    command:
+      - "./gradlew"
+      - "bootRun"
+      - "--no-daemon"
+      - "--console=plain"
 
 #  db:
 #    container_name: postgres-container
