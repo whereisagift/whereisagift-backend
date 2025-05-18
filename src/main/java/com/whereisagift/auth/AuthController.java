@@ -82,10 +82,9 @@ public class AuthController {
             throw new IllegalStateException("No current HTTP response");
         }
 
-        // Build and set the HttpOnly cookie
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(true)      // set false if you're testing over HTTP locally
+                .secure(true)
                 .path("/")
                 .maxAge(3600)
                 .sameSite("Strict")
