@@ -85,7 +85,7 @@ public class AuthController {
             throw new IllegalStateException("No current HTTP response");
         }
 
-        ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("jwt", token)
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -93,10 +93,10 @@ public class AuthController {
                 .sameSite("Strict");
 
         if (cookieDomain != null && !cookieDomain.isBlank()) {
-            cookie.domain(cookieDomain);
+            cookieBuilder.domain(cookieDomain);
         }
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
 
     private User toUser(AuthPayload payload) {
