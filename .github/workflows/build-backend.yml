@@ -29,6 +29,7 @@ jobs:
           spring.security.oauth2.resourceserver.jwt.issuer.uri=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}
           telegram.bot.token=${{ secrets.TELEGRAM_BOT_TOKEN }}
           jwt.secret=${{ secrets.JWT_SECRET }}
+          cookie.domain=${{ secrets.COOKIE_DOMAIN }}
           EOF
 
       - name: Build and Push Docker Image

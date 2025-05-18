@@ -40,6 +40,9 @@ public class AuthController {
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
+    @Value("${cookie.domain}")
+    private String cookieDomain;
+
     @MutationMapping
     public User login(@Argument AuthPayload authPayload) {
         if (!validateTelegramHash(authPayload)) {
@@ -82,15 +85,18 @@ public class AuthController {
             throw new IllegalStateException("No current HTTP response");
         }
 
-        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+        ResponseCookie.ResponseCookieBuilder cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(3600)
-                .sameSite("Strict")
-                .build();
+                .sameSite("Strict");
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            cookie.domain(cookieDomain);
+        }
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.build().toString());
     }
 
     private User toUser(AuthPayload payload) {
