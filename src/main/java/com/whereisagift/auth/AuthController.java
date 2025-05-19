@@ -87,13 +87,14 @@ public class AuthController {
 
         ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(true)
                 .path("/")
-                .maxAge(3600)
-                .sameSite("Strict");
+                .maxAge(3600);
+
 
         if (cookieDomain != null && !cookieDomain.isBlank()) {
             cookieBuilder.domain(cookieDomain);
+        } else {
+            cookieBuilder.secure(true).sameSite("Strict");
         }
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
