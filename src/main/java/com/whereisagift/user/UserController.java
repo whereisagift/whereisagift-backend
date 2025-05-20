@@ -24,7 +24,7 @@ public class UserController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     public User me(@AuthenticationPrincipal(expression = "subject") String userId) {
-        Long id = Long.valueOf(userId);
+        long id = Long.parseLong(userId);
         return userRepository.findById(id)
                 .orElseThrow(() -> new GraphQLException("User not found"));
     }
