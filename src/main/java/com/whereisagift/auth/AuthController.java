@@ -59,6 +59,31 @@ public class AuthController {
         return user;
     }
 
+    @MutationMapping
+    private LogoutResponse logout() {
+
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) {
+            throw new IllegalStateException("No current request attributes");
+        }
+
+        HttpServletResponse response = attrs.getResponse();
+        if (response == null) {
+            throw new IllegalStateException("No current HTTP response");
+        }
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return new LogoutResponse(true, "You have successfully logged out");
+    }
+
     private String createJwtForUser(User user) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(user.getId().toString())
