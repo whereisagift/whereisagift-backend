@@ -91,10 +91,10 @@ public class AuthController {
                 .maxAge(3600);
 
 
-        if (cookieDomain != null && !cookieDomain.isBlank()) {
-            cookieBuilder.domain(cookieDomain);
-        } else {
+        if (cookieDomain == null || cookieDomain.isBlank()) {
             cookieBuilder.secure(true).sameSite("Strict");
+        } else {
+            cookieBuilder.domain(cookieDomain);
         }
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
