@@ -56,6 +56,12 @@ type LogoutResponse {
     message: String!
 }
 
+type WishlistResponse {
+    isEmpty: Boolean!
+    message: String
+    data: [Wishlist]
+}
+
 type Mutation {
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
