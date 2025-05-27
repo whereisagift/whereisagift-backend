@@ -29,16 +29,9 @@ type Wish {
 }
 
 type Booking {
-    reservist: Reservist!
+    nickname: String!
     date: String!
 }
-
-type Reservist {
-    id: String!
-    nickname: String!
-}
-
-
 
 input AuthPayload {
     id: Int!
