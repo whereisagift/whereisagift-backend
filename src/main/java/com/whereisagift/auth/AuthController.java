@@ -40,8 +40,8 @@ public class AuthController {
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
-    @Value("${cookie.domain}")
-    private String cookieDomain;
+//    @Value("${cookie.domain}")
+//    private String cookieDomain;
 
     @MutationMapping
     public User login(@Argument AuthPayload authPayload) {
@@ -60,7 +60,7 @@ public class AuthController {
     }
 
     @MutationMapping
-    private LogoutResponse logout() {
+    private boolean logout() {
 
         ServletRequestAttributes attrs =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -81,7 +81,7 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return new LogoutResponse(true, "You have successfully logged out");
+        return true;
     }
 
     private String createJwtForUser(User user) {
@@ -116,11 +116,11 @@ public class AuthController {
                 .maxAge(3600);
 
 
-        if (cookieDomain == null || cookieDomain.isBlank()) {
-            cookieBuilder.secure(true).sameSite("Strict");
-        } else {
-            cookieBuilder.domain(cookieDomain);
-        }
+//        if (cookieDomain == null || cookieDomain.isBlank()) {
+//            cookieBuilder.secure(true).sameSite("Strict");
+//        } else {
+//            cookieBuilder.domain(cookieDomain);
+//        }
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
