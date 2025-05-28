@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
-    List<Wishlist> findByCreatorId(Long id);
+    Iterable<Wishlist> findByCreatorId(Long id);
 
 }

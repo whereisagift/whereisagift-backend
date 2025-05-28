@@ -27,30 +27,23 @@ public class WishlistController {
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public WishlistResponse<List<Wishlist>> wishlists(@AuthenticationPrincipal(expression = "subject") String userId) {
-
+    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal(expression = "subject") String userId) {
         long id = Long.parseLong(userId);
 
-        List<Wishlist> wishlists = wishlistRepository.findByCreatorId(id);
-
-        return wishlists.isEmpty()
-                ? WishlistResponse.empty("You don't have any wishlist yet")
-                : WishlistResponse.of(wishlists);
+        return wishlistRepository.findByCreatorId(id);
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
     public Wishlist createWishlist(@Argument String name, @AuthenticationPrincipal(expression = "subject") String userId) {
+        long id = Long.parseLong(userId);
+        User user = userRepository.getReferenceById(id);
+
         Wishlist wishlist = new Wishlist();
         wishlist.setName(name);
-
-        long id = Long.parseLong(userId);
-
-        User user = userRepository.getReferenceById(id);
         wishlist.setCreator(user);
 
         return wishlistRepository.save(wishlist);
     }
-
 }
