@@ -2,10 +2,13 @@ package com.whereisagift.wishlist;
 
 import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -23,18 +26,24 @@ public class WishlistController {
     }
 
     @QueryMapping
-    public Iterable<Wishlist> wishlists() {
-        return wishlistRepository.findAll();
+    @PreAuthorize("isAuthenticated()")
+    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal(expression = "subject") String userId) {
+        long id = Long.parseLong(userId);
+
+        return wishlistRepository.findByCreatorId(id);
     }
 
     @MutationMapping
-    public Wishlist createWishlist(@Argument String name) {
+    @PreAuthorize("isAuthenticated()")
+    @Transactional
+    public Wishlist createWishlist(@Argument String name, @AuthenticationPrincipal(expression = "subject") String userId) {
+        long id = Long.parseLong(userId);
+        User user = userRepository.getReferenceById(id);
+
         Wishlist wishlist = new Wishlist();
         wishlist.setName(name);
-        User user = userRepository.findById(1L).orElse(null);
         wishlist.setCreator(user);
 
         return wishlistRepository.save(wishlist);
     }
-
 }

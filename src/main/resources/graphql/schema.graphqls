@@ -29,16 +29,9 @@ type Wish {
 }
 
 type Booking {
-    reservist: Reservist!
+    nickname: String!
     date: String!
 }
-
-type Reservist {
-    id: String!
-    nickname: String!
-}
-
-
 
 input AuthPayload {
     id: Int!
@@ -58,17 +51,12 @@ type Query {
     me: User!
 }
 
-type LogoutResponse {
-    success: Boolean!
-    message: String!
-}
-
 type Mutation {
     createWishlist(name: String!): Wishlist
     createWish(name: String!): Wish
     login(
         authPayload: AuthPayload!
     ): User
-    logout: LogoutResponse
+    logout: Boolean!
 }
 
