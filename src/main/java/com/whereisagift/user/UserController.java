@@ -28,9 +28,4 @@ public class UserController {
         return userRepository.findById(id)
                 .orElseThrow(() -> new GraphQLException("User not found"));
     }
-
-    @QueryMapping
-    public Iterable<User> users() {
-        return userRepository.findAll();
-    }
 }
