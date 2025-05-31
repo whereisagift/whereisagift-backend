@@ -49,6 +49,11 @@ input WishlistInput {
     wishIds: [Int]
 }
 
+input WishInput {
+    name: String!
+    wishlistId: [Int]
+}
+
 type Query {
     user(id: ID!): User
     wishlists: [Wishlist!]
@@ -58,7 +63,7 @@ type Query {
 
 type Mutation {
     createWishlist(wishlistInput: WishlistInput!): Wishlist
-    createWish(name: String!): Wish
+    createWish(wishInput: WishInput!): Wish
     login(
         authPayload: AuthPayload!
     ): User
