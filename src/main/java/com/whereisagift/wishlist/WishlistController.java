@@ -50,18 +50,20 @@ public class WishlistController {
         String description = wishlistInput.getDescription();
         Iterable<Long> wishIds = wishlistInput.getWishIds();
 
-        wishIds.forEach(
-                wishId -> {
-                    Wish wish = wishRepository.findById(wishId).orElse(null);
-                    wishes.add(wish);
-                }
-        );
-
         Wishlist wishlist = new Wishlist();
         wishlist.setName(name);
         wishlist.setDescription(description);
-        wishlist.setWishes(wishes);
         wishlist.setCreator(user);
+
+        if (wishIds.iterator().hasNext()) {
+            wishIds.forEach(
+                    wishId -> {
+                        Wish wish = wishRepository.findById(wishId).orElse(null);
+                        wishes.add(wish);
+                    }
+            );
+            wishlist.setWishes(wishes);
+        }
 
         return wishlistRepository.save(wishlist);
     }

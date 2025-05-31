@@ -47,4 +47,6 @@ public class WishController {
         return wishRepository.save(wish);
     }
 
+
+
 }
