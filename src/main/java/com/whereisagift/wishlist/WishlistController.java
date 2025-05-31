@@ -64,7 +64,6 @@ public class WishlistController {
             );
             wishlist.setWishes(wishes);
         }
-
         return wishlistRepository.save(wishlist);
     }
 }
