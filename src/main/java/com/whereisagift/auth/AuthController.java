@@ -41,8 +41,8 @@ public class AuthController {
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
-//    @Value("${cookie.domain}")
-//    private String cookieDomain;
+    @Value("${cookie.domain}")
+    private String cookieDomain;
 
     @MutationMapping
     @Transactional
@@ -118,11 +118,11 @@ public class AuthController {
                 .maxAge(3600);
 
 
-//        if (cookieDomain == null || cookieDomain.isBlank()) {
-//            cookieBuilder.secure(true).sameSite("Strict");
-//        } else {
-//            cookieBuilder.domain(cookieDomain);
-//        }
+        if (cookieDomain == null || cookieDomain.isBlank()) {
+            cookieBuilder.secure(true).sameSite("Strict");
+        } else {
+            cookieBuilder.domain(cookieDomain);
+        }
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
