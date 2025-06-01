@@ -45,7 +45,6 @@ public class WishController {
     @Transactional
     public Wish createWish(@Argument WishInput wishInput,
                            @AuthenticationPrincipal(expression = "subject") String userId) {
-        List<Wishlist> wishlists = new ArrayList<>();
         long id = Long.parseLong(userId);
         User user = userRepository.getReferenceById(id);
 
@@ -57,17 +56,9 @@ public class WishController {
         wish.setCreator(user);
 
         if (wishlistIds.iterator().hasNext()) {
-            wishlistIds.forEach(
-                    wishlistId -> {
-                        Wishlist wishlist = wishlistRepository.findById(wishlistId).orElse(null);
-                        wishlists.add(wishlist);
-                    }
-            );
+            List<Wishlist> wishlists = wishlistRepository.findAllById(wishlistIds);
             wish.setWishlists(wishlists);
         }
         return wishRepository.save(wish);
     }
-
-
-
 }
