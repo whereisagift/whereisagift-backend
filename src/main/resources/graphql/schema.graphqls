@@ -46,12 +46,12 @@ input AuthPayload {
 input WishlistInput {
     name: String!
     description: String
-    wishIds: [Int]
+    wishIds: [ID]
 }
 
 input WishInput {
     name: String!
-    wishlistId: [Int]
+    wishlistId: [ID]
 }
 
 type Query {
