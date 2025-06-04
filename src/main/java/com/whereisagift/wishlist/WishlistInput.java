@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class WishlistInput {
-    String name;
-    String description;
-    Iterable<Long> wishIds;
+    private String name;
+    private String description;
+    private Iterable<Long> wishIds;
 }
