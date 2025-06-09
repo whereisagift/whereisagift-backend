@@ -20,6 +20,9 @@ public class Wishlist {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;

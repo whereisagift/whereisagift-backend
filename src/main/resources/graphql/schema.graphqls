@@ -43,8 +43,18 @@ input AuthPayload {
     hash: String!
 }
 
+input WishlistInput {
+    name: String!
+    description: String
+    wishIds: [ID!]
+}
+
+input WishInput {
+    name: String!
+    wishlistIds: [ID!]
+}
+
 type Query {
-    users: [User!]!
     user(id: ID!): User
     wishlists: [Wishlist!]
     wishes: [Wish!]
@@ -52,8 +62,8 @@ type Query {
 }
 
 type Mutation {
-    createWishlist(name: String!): Wishlist
-    createWish(name: String!): Wish
+    createWishlist(wishlistInput: WishlistInput!): Wishlist
+    createWish(wishInput: WishInput!): Wish
     login(
         authPayload: AuthPayload!
     ): User
