@@ -12,6 +12,7 @@ type User {
 type Wishlist {
     id: ID!
     name: String!
+    description: String
     creator: User!
     wishes: [Wish!]
 }
