@@ -3,7 +3,7 @@ type User {
     telegramId: String!
     username: String!
     firstName: String!
-    lastName: String!
+    lastName: String
     photoUrl: String!
     wishlists: [Wishlist]
     wishes: [Wish]
@@ -37,7 +37,7 @@ type Booking {
 input AuthPayload {
     id: Int!
     first_name: String!
-    last_name: String!
+    last_name: String
     username: String!
     photo_url: String!
     auth_date: Int!
