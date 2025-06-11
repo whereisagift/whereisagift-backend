@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,8 +42,8 @@ public class AuthController {
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
-    @Value("${cookie.domain}")
-    private String cookieDomain;
+//    @Value("${cookie.domain}")
+//    private String cookieDomain;
 
     @MutationMapping
     @Transactional
@@ -118,11 +119,11 @@ public class AuthController {
                 .maxAge(3600);
 
 
-        if (cookieDomain == null || cookieDomain.isBlank()) {
-            cookieBuilder.secure(true).sameSite("Strict");
-        } else {
-            cookieBuilder.domain(cookieDomain);
-        }
+//        if (cookieDomain == null || cookieDomain.isBlank()) {
+//            cookieBuilder.secure(true).sameSite("Strict");
+//        } else {
+//            cookieBuilder.domain(cookieDomain);
+//        }
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
@@ -131,7 +132,7 @@ public class AuthController {
         User user = new User();
         user.setTelegramId(payload.getTelegramId().longValue());
         user.setFirstName(payload.getFirstName());
-        if (payload.getLastName() != null) user.setLastName(payload.getLastName());
+        if (Objects.equals(payload.getLastName(), null)) user.setLastName("");
         user.setUsername(payload.getUsername());
         user.setPhotoUrl(payload.getPhotoUrl());
         user.setAuthDate(payload.getAuthDate().longValue());
