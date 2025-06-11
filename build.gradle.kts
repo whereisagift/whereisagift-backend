@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     java
     id("org.springframework.boot") version "3.4.3"
@@ -29,8 +31,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     implementation("commons-codec:commons-codec")
-    implementation ("org.springframework.boot:spring-boot-starter-security")
-    implementation ("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -50,6 +52,11 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.bootRun {
-    jvmArgs = listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000")
+tasks.named<BootRun>("bootRun") {
+    // читаем переменную окружения, или даём дефолт "8000"
+    val debugPort = System.getenv("DEBUG_PORT_ON_CONTAINER") ?: "8000"
+    // заставляем JDWP слушать на всех интерфейсах и на нужном порту
+    jvmArgs = listOf(
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:$debugPort"
+    )
 }

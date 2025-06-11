@@ -41,25 +41,37 @@ public class AuthController {
     @Value("${telegram.bot.token}")
     private String telegramBotToken;
 
-    @Value("${cookie.domain}")
+    @Value("${cookie.domain:}")
     private String cookieDomain;
+
+    @Value("${local.user.id:}")
+    private String localUserId;
+
 
     @MutationMapping
     @Transactional
     public User login(@Argument AuthPayload authPayload) {
-        if (!validateTelegramHash(authPayload)) {
-            throw new GraphQLException("Invalid Telegram hash");
+        User user;
+
+        if (localUserId.isBlank()) {
+            if (!validateTelegramHash(authPayload)) {
+                throw new GraphQLException("Invalid Telegram hash");
+            }
+            Long telegramId = authPayload.getTelegramId().longValue();
+            user = userRepository.findByTelegramId(telegramId)
+                    .orElseGet(() -> userRepository.save(toUser(authPayload)));
+        } else {
+            long userId = Long.parseLong(localUserId);
+            user = userRepository.findById(userId)
+                    .orElseThrow(() -> new GraphQLException("User not found: " + userId));
         }
 
-        User user = userRepository.findByTelegramId(authPayload.getTelegramId().longValue())
-                .orElseGet(() -> userRepository.save(toUser(authPayload)));
-
         String token = createJwtForUser(user);
-
         writeJwtCookie(token);
 
         return user;
     }
+
 
     @MutationMapping
     private boolean logout() {
@@ -118,7 +130,7 @@ public class AuthController {
                 .maxAge(3600);
 
 
-        if (cookieDomain == null || cookieDomain.isBlank()) {
+        if (cookieDomain.isBlank()) {
             cookieBuilder.secure(true).sameSite("Strict");
         } else {
             cookieBuilder.domain(cookieDomain);
