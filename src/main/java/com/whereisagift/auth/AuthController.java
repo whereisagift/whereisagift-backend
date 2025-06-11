@@ -131,7 +131,7 @@ public class AuthController {
         User user = new User();
         user.setTelegramId(payload.getTelegramId().longValue());
         user.setFirstName(payload.getFirstName());
-        user.setLastName(payload.getLastName());
+        if (payload.getLastName() != null) user.setLastName(payload.getLastName());
         user.setUsername(payload.getUsername());
         user.setPhotoUrl(payload.getPhotoUrl());
         user.setAuthDate(payload.getAuthDate().longValue());
@@ -144,7 +144,7 @@ public class AuthController {
             hashMap.put("auth_date", payload.getAuthDate().toString());
             hashMap.put("first_name", payload.getFirstName());
             hashMap.put("id", payload.getTelegramId().toString());
-            hashMap.put("last_name", payload.getLastName());
+            if (payload.getLastName() != null) hashMap.put("last_name", payload.getLastName());
             hashMap.put("photo_url", payload.getPhotoUrl());
             hashMap.put("username", payload.getUsername());
 
