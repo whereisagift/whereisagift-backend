@@ -1,6 +1,6 @@
 package com.whereisagift.wishlist;
 
-import com.whereisagift.user.User;
+import com.whereisagift.user.UserRepository;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import jakarta.transaction.Transactional;
@@ -20,36 +20,37 @@ public class WishlistController {
 
     private final WishlistRepository wishlistRepository;
     private final WishRepository wishRepository;
+    private final UserRepository userRepository;
 
-    public WishlistController(WishlistRepository wishlistRepository, WishRepository wishRepository) {
+    public WishlistController(WishlistRepository wishlistRepository, WishRepository wishRepository, UserRepository userRepository) {
         this.wishlistRepository = wishlistRepository;
         this.wishRepository = wishRepository;
+        this.userRepository = userRepository;
     }
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal User user) {
-        return wishlistRepository.findByCreatorId(user.getId());
+    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal Long userId) {
+        return wishlistRepository.findByCreatorId(userId);
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public Wishlist createWishlist(@Argument WishlistInput wishlistInput, @AuthenticationPrincipal User user) {
-        String name = wishlistInput.getName();
-        String description = wishlistInput.getDescription();
-        Iterable<Long> wishIds = wishlistInput.getWishIds();
+    public Wishlist createWishlist(@Argument WishlistInput wishlistInput, @AuthenticationPrincipal Long userId) {
+        List<Long> wishIds = wishlistInput.getWishIds();
 
         Wishlist wishlist = new Wishlist();
-        wishlist.setName(name);
-        wishlist.setDescription(description);
-        wishlist.setCreator(user);
+        wishlist.setName(wishlistInput.getName());
+        wishlist.setDescription(wishlistInput.getDescription());
+        wishlist.setCreator(userRepository.getReferenceById(userId));
 
-        if (wishIds.iterator().hasNext()) {
+        if (!wishIds.isEmpty()) {
             List<Wish> wishes = wishRepository.findAllById(wishIds);
             wishlist.setWishes(wishes);
         }
+
         return wishlistRepository.save(wishlist);
     }
 }

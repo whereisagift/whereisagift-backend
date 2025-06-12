@@ -24,7 +24,7 @@ public class UserController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public User me(@AuthenticationPrincipal User user) {
-        return user;
+    public User me(@AuthenticationPrincipal Long userId) {
+        return userRepository.getReferenceById(userId);
     }
 }
