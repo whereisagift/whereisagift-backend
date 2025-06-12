@@ -1,6 +1,5 @@
 package com.whereisagift.wish;
 
-import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
 import com.whereisagift.wishlist.Wishlist;
 import com.whereisagift.wishlist.WishlistRepository;
@@ -31,23 +30,23 @@ public class WishController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public Iterable<Wish> wishes(@AuthenticationPrincipal User user) {
-        return wishRepository.findByCreator(user);
+    public Iterable<Wish> wishes(@AuthenticationPrincipal Long userId) {
+        return wishRepository.findByCreator(userRepository.getReferenceById(userId));
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
     public Wish createWish(@Argument WishInput wishInput,
-                           @AuthenticationPrincipal User user) {
-        String name = wishInput.getName();
-        Iterable<Long> wishlistIds = wishInput.getWishlistIds();
+                           @AuthenticationPrincipal Long userId) {
+        List<Long> wishlistIds = wishInput.getWishlistIds();
 
         Wish wish = new Wish();
-        wish.setName(name);
-        wish.setCreator(user);
+        wish.setName(wishInput.getName());
+        wish.setDescription(wishInput.getDescription());
+        wish.setCreator(userRepository.getReferenceById(userId));
 
-        if (wishlistIds.iterator().hasNext()) {
+        if (!wishlistIds.isEmpty()) {
             List<Wishlist> wishlists = wishlistRepository.findAllById(wishlistIds);
             wish.setWishlists(wishlists);
         }

@@ -1,6 +1,6 @@
 package com.whereisagift.config;
 
-import com.whereisagift.auth.AuthJwtConverter;
+import com.whereisagift.auth.AuthJwtToUserIdConverter;
 import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +17,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final AuthJwtConverter authJwtConverter;
+    private final AuthJwtToUserIdConverter authJwtToUserIdConverter;
 
-    public SecurityConfig(AuthJwtConverter jwtAuthConverter) {
-        this.authJwtConverter = jwtAuthConverter;
+    public SecurityConfig(AuthJwtToUserIdConverter authJwtToUserIdConverter) {
+        this.authJwtToUserIdConverter = authJwtToUserIdConverter;
     }
 
     @Bean
@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .bearerTokenResolver(cookieBearerTokenResolver())
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)
-                                .jwtAuthenticationConverter(authJwtConverter)
+                                .jwtAuthenticationConverter(authJwtToUserIdConverter)
                         )
                 );
         return http.build();
