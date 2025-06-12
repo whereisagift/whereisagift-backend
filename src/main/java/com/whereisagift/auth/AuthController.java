@@ -4,7 +4,6 @@ import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
 import graphql.GraphQLException;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ public class AuthController {
 
 
     @MutationMapping
-    @Transactional
     public User login(@Argument AuthPayload authPayload) {
         User user;
 

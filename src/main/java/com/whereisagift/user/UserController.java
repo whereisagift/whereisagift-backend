@@ -1,6 +1,6 @@
 package com.whereisagift.user;
 
-import graphql.GraphQLException;
+import jakarta.transaction.Transactional;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +23,8 @@ public class UserController {
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public User me(@AuthenticationPrincipal(expression = "subject") String userId) {
-        long id = Long.parseLong(userId);
-        return userRepository.findById(id)
-                .orElseThrow(() -> new GraphQLException("User not found"));
+    @Transactional
+    public User me(@AuthenticationPrincipal User user) {
+        return user;
     }
 }

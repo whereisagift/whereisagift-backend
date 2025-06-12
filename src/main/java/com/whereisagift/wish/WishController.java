@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,11 +31,7 @@ public class WishController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public Iterable<Wish> wishes(@AuthenticationPrincipal(expression = "subject") String userId) {
-        long id = Long.parseLong(userId);
-
-        User user = userRepository.getReferenceById(id);
-        
+    public Iterable<Wish> wishes(@AuthenticationPrincipal User user) {
         return wishRepository.findByCreator(user);
     }
 
@@ -44,10 +39,7 @@ public class WishController {
     @PreAuthorize("isAuthenticated()")
     @Transactional
     public Wish createWish(@Argument WishInput wishInput,
-                           @AuthenticationPrincipal(expression = "subject") String userId) {
-        long id = Long.parseLong(userId);
-        User user = userRepository.getReferenceById(id);
-
+                           @AuthenticationPrincipal User user) {
         String name = wishInput.getName();
         Iterable<Long> wishlistIds = wishInput.getWishlistIds();
 

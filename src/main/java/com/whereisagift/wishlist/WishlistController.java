@@ -1,7 +1,6 @@
 package com.whereisagift.wishlist;
 
 import com.whereisagift.user.User;
-import com.whereisagift.user.UserRepository;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import jakarta.transaction.Transactional;
@@ -13,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,30 +19,24 @@ import java.util.List;
 public class WishlistController {
 
     private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
     private final WishRepository wishRepository;
 
-    public WishlistController(WishlistRepository wishlistRepository, UserRepository userRepository, WishRepository wishRepository) {
+    public WishlistController(WishlistRepository wishlistRepository, WishRepository wishRepository) {
         this.wishlistRepository = wishlistRepository;
-        this.userRepository = userRepository;
         this.wishRepository = wishRepository;
     }
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal(expression = "subject") String userId) {
-        long id = Long.parseLong(userId);
-
-        return wishlistRepository.findByCreatorId(id);
+    @Transactional
+    public Iterable<Wishlist> wishlists(@AuthenticationPrincipal User user) {
+        return wishlistRepository.findByCreatorId(user.getId());
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
     @Transactional
-    public Wishlist createWishlist(@Argument WishlistInput wishlistInput, @AuthenticationPrincipal(expression = "subject") String userId) {
-        long id = Long.parseLong(userId);
-        User user = userRepository.getReferenceById(id);
-
+    public Wishlist createWishlist(@Argument WishlistInput wishlistInput, @AuthenticationPrincipal User user) {
         String name = wishlistInput.getName();
         String description = wishlistInput.getDescription();
         Iterable<Long> wishIds = wishlistInput.getWishIds();
