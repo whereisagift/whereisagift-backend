@@ -1,7 +1,8 @@
-package com.whereisagift.auth.config;
+package com.whereisagift.infrastructure.security;
 
-import com.whereisagift.auth.AuthJwtToUserIdConverter;
-import jakarta.servlet.http.Cookie;
+import com.whereisagift.infrastructure.jwt.JwtConverter;
+import com.whereisagift.infrastructure.jwt.JwtCookieService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -9,19 +10,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthJwtToUserIdConverter authJwtToUserIdConverter;
-
-    public SecurityConfig(AuthJwtToUserIdConverter authJwtToUserIdConverter) {
-        this.authJwtToUserIdConverter = authJwtToUserIdConverter;
-    }
+    private final JwtConverter jwtConverter;
+    private final JwtCookieService jwtCookieService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
@@ -33,24 +31,12 @@ public class SecurityConfig {
                 )
 
                 .oauth2ResourceServer(oauth -> oauth
-                        .bearerTokenResolver(cookieBearerTokenResolver())
+                        .bearerTokenResolver(jwtCookieService)
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)
-                                .jwtAuthenticationConverter(authJwtToUserIdConverter)
+                                .jwtAuthenticationConverter(jwtConverter)
                         )
                 );
         return http.build();
-    }
-
-    private BearerTokenResolver cookieBearerTokenResolver() {
-        return request -> {
-            if (request.getCookies() == null) return null;
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-            return null;
-        };
     }
 }

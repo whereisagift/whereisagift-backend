@@ -1,4 +1,4 @@
-package com.whereisagift.auth.config;
+package com.whereisagift.infrastructure.jwt;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -6,6 +6,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -19,29 +20,26 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class JwtConfig {
 
-    private final String algorithm = "HmacSHA256";
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+    private final SecretKey jwtSecretKey() {
+        return new SecretKeySpec(
+                jwtSecret.getBytes(StandardCharsets.UTF_8),
+                JwsAlgorithms.HS256
+        );
+    }
+
     @Bean
     public JwtEncoder jwtEncoder() {
-        SecretKey key = new SecretKeySpec(
-                jwtSecret.getBytes(StandardCharsets.UTF_8),
-                algorithm
-        );
-        JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(key);
+        JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(jwtSecretKey());
         return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKey key = new SecretKeySpec(
-                jwtSecret.getBytes(StandardCharsets.UTF_8),
-                algorithm
-        );
-
         return NimbusJwtDecoder
-                .withSecretKey(key)
+                .withSecretKey(jwtSecretKey())
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
     }
