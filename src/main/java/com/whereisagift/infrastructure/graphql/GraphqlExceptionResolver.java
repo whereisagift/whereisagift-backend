@@ -1,4 +1,4 @@
-package com.whereisagift.graphql;
+package com.whereisagift.infrastructure.graphql;
 
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;

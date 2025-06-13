@@ -4,6 +4,7 @@ import com.whereisagift.user.UserRepository;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -16,17 +17,12 @@ import java.util.List;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class WishlistController {
 
-    private final WishlistRepository wishlistRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
-
-    public WishlistController(WishlistRepository wishlistRepository, WishRepository wishRepository, UserRepository userRepository) {
-        this.wishlistRepository = wishlistRepository;
-        this.wishRepository = wishRepository;
-        this.userRepository = userRepository;
-    }
+    private final WishlistRepository wishlistRepository;
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")

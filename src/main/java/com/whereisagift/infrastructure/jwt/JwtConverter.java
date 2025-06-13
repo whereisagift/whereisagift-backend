@@ -1,5 +1,6 @@
-package com.whereisagift.auth;
+package com.whereisagift.infrastructure.jwt;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,17 +12,19 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class AuthJwtToUserIdConverter
+@RequiredArgsConstructor
+public class JwtConverter
         implements Converter<Jwt, AbstractAuthenticationToken> {
 
-    private final JwtGrantedAuthoritiesConverter authConverter =
+    private final JwtGrantedAuthoritiesConverter converter =
             new JwtGrantedAuthoritiesConverter();
+
+    private final JwtProvider jwtProvider;
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
-        Long userId = Long.valueOf(jwt.getSubject());
-        Collection<GrantedAuthority> auths = authConverter.convert(jwt);
+        Collection<GrantedAuthority> auths = converter.convert(jwt);
 
-        return new UsernamePasswordAuthenticationToken(userId, jwt, auths);
+        return new UsernamePasswordAuthenticationToken(jwtProvider.getAuthorizationPrincipal(jwt), jwt, auths);
     }
 }
