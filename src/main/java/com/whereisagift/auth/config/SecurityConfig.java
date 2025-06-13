@@ -1,4 +1,4 @@
-package com.whereisagift.config;
+package com.whereisagift.auth.config;
 
 import com.whereisagift.auth.AuthJwtToUserIdConverter;
 import jakarta.servlet.http.Cookie;

@@ -1,4 +1,4 @@
-package com.whereisagift.config;
+package com.whereisagift.auth.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
