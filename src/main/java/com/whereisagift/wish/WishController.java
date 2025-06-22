@@ -1,9 +1,6 @@
 package com.whereisagift.wish;
 
-import com.whereisagift.user.UserRepository;
-import com.whereisagift.wishlist.Wishlist;
-import com.whereisagift.wishlist.WishlistRepository;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -11,41 +8,44 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Controller
+@Validated
 @RequiredArgsConstructor
 public class WishController {
 
-    private final WishRepository wishRepository;
-    private final UserRepository userRepository;
-    private final WishlistRepository wishlistRepository;
-
+    private final WishService wishService;
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public Iterable<Wish> wishes(@AuthenticationPrincipal Long userId) {
-        return wishRepository.findByCreator(userRepository.getReferenceById(userId));
+    public List<Wish> wishes(@AuthenticationPrincipal Long userId) {
+        return wishService.getAllByUser(userId);
+    }
+
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
+    public Wish wish(@Argument Long id, @AuthenticationPrincipal Long userId) {
+        return wishService.getById(id, userId);
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public Wish createWish(@Argument WishInput wishInput,
-                           @AuthenticationPrincipal Long userId) {
-        List<Long> wishlistIds = wishInput.getWishlistIds();
+    public Wish createWish(@Valid @Argument WishInput wishInput, @AuthenticationPrincipal Long userId) {
+        return wishService.createWish(wishInput, userId);
+    }
 
-        Wish wish = new Wish();
-        wish.setName(wishInput.getName());
-        wish.setDescription(wishInput.getDescription());
-        wish.setCreator(userRepository.getReferenceById(userId));
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public Wish updateWish(@Argument Long id, @Valid @Argument WishInput wishInput, @AuthenticationPrincipal Long userId) {
+        return wishService.updateWish(id, wishInput, userId);
+    }
 
-        if (!wishlistIds.isEmpty()) {
-            List<Wishlist> wishlists = wishlistRepository.findAllById(wishlistIds);
-            wish.setWishlists(wishlists);
-        }
-        return wishRepository.save(wish);
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public Boolean deleteWish(@Argument Long id, @AuthenticationPrincipal Long userId) {
+        return wishService.deleteWish(id, userId);
     }
 }
