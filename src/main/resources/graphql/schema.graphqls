@@ -1,12 +1,33 @@
-type User {
+scalar DateTime
+
+enum ProductSource {
+    Manual
+    Steam
+}
+
+type Price {
+    currency: String!
+    value: Float!
+}
+
+type Booking {
+    nickname: String!
+    date: String!
+}
+
+type Wish {
     id: ID!
-    telegramId: String!
-    username: String!
-    firstName: String!
-    lastName: String
-    photoUrl: String!
-    wishlists: [Wishlist]
-    wishes: [Wish]
+    name: String!
+    description: String
+    link: String
+    img: String
+    rate: Int!
+    type: ProductSource!
+    price: Price
+    creator: User!
+    wishlists: [Wishlist!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
 }
 
 type Wishlist {
@@ -14,24 +35,18 @@ type Wishlist {
     name: String!
     description: String
     creator: User!
-    wishes: [Wish!]
+    wishes: [Wish!]!
 }
 
-type Wish {
+type User {
     id: ID!
-    name: String!
-    url: String
-    pictureUrl: String
-    booking: Booking
-    creator: User!
-    wishlists: [Wishlist]
-    orderDate: String
-    price: String
-}
-
-type Booking {
-    nickname: String!
-    date: String!
+    telegramId: String!
+    username: String!
+    firstName: String!
+    lastName: String
+    photoUrl: String!
+    wishlists: [Wishlist!]!
+    wishes: [Wish!]!
 }
 
 input AuthPayload {
@@ -44,30 +59,41 @@ input AuthPayload {
     hash: String!
 }
 
+input PriceInput {
+    currency: String!
+    value: Float!
+}
+
+input WishInput {
+    name: String!
+    description: String
+    link: String
+    img: String
+    rate: Int
+    type: ProductSource!
+    price: PriceInput
+    wishlistIds: [ID!]!
+}
+
 input WishlistInput {
     name: String!
     description: String
     wishIds: [ID!]
 }
 
-input WishInput {
-    name: String!
-    wishlistIds: [ID!]
-}
-
 type Query {
-    user(id: ID!): User
-    wishlists: [Wishlist!]
-    wishes: [Wish!]
     me: User!
+    user(id: ID!): User
+    wish(id: ID!): Wish!
+    wishes: [Wish!]!
+    wishlists: [Wishlist!]!
 }
 
 type Mutation {
-    createWishlist(wishlistInput: WishlistInput!): Wishlist
-    createWish(wishInput: WishInput!): Wish
-    login(
-        authPayload: AuthPayload!
-    ): User
+    login(authPayload: AuthPayload!): User
     logout: Boolean!
+    createWish(wishInput: WishInput!): Wish!
+    updateWish(id: ID!, wishInput: WishInput!): Wish!
+    deleteWish(id: ID!): Boolean!
+    createWishlist(wishlistInput: WishlistInput!): Wishlist
 }
-
