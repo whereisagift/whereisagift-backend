@@ -9,8 +9,6 @@ import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,52 +17,52 @@ public class GraphqlExceptionResolver extends DataFetcherExceptionResolverAdapte
 
     @Override
     protected List<GraphQLError> resolveToMultipleErrors(Throwable ex, DataFetchingEnvironment env) {
-        List<GraphQLError> errors = new ArrayList<>();
-
         if (ex instanceof ConstraintViolationException violationEx) {
-            for (ConstraintViolation<?> violation : violationEx.getConstraintViolations()) {
-                String fieldPath = extractFieldPath(violation.getPropertyPath().toString());
+            return violationEx.getConstraintViolations().stream()
+                    .map(violation -> {
+                        List<Object> path = extractFullPath(violation);
+                        String message = violation.getMessage();
+                        Map<String, Object> ext = Map.of(
+                                "code", "ValidationError",
+                                "field", String.join(".", path.stream().map(Object::toString).toList()),
+                                "message", message
+                        );
+                        return GraphqlErrorBuilder.newError(env)
+                                .message("Validation failed on field '%s': %s".formatted(path.get(path.size() - 1), message))
+                                .path(path)
+                                .extensions(ext)
+                                .errorType(ErrorType.BAD_REQUEST)
+                                .build();
+                    })
+                    .toList();
+        }
+        return null;
+    }
 
-                Map<String, Object> extensions = new LinkedHashMap<>();
-                extensions.put("code", "ValidationError");
-                extensions.put("field", fieldPath);
-                extensions.put("message", violation.getMessage());
+    @Override
+    protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
+        ErrorType type;
+        String code;
 
-                errors.add(GraphqlErrorBuilder.newError(env)
-                        .message("Validation failed on field '%s': %s".formatted(fieldPath, violation.getMessage()))
-                        .extensions(extensions)
-                        .errorType(ErrorType.BAD_REQUEST)
-                        .build());
-            }
+        if (ex instanceof IllegalArgumentException) {
+            type = ErrorType.BAD_REQUEST;
+            code = "BadRequest";
         } else {
-            String code;
-            ErrorType type;
-
-            if (ex instanceof IllegalArgumentException) {
-                code = "BadRequest";
-                type = ErrorType.BAD_REQUEST;
-            } else {
-                code = "Internal";
-                type = ErrorType.INTERNAL_ERROR;
-            }
-
-            Map<String, Object> extensions = new LinkedHashMap<>();
-            extensions.put("code", code);
-
-            errors.add(GraphqlErrorBuilder.newError(env)
-                    .message(ex.getMessage())
-                    .path(env.getExecutionStepInfo().getPath())
-                    .location(env.getField().getSourceLocation())
-                    .extensions(extensions)
-                    .errorType(type)
-                    .build());
+            type = ErrorType.INTERNAL_ERROR;
+            code = "Internal";
         }
 
-        return errors;
+        return GraphqlErrorBuilder.newError(env)
+                .message(ex.getMessage())
+                .path(env.getExecutionStepInfo().getPath().toList())
+                .location(env.getField().getSourceLocation())
+                .extensions(Map.of("code", code))
+                .errorType(type)
+                .build();
     }
 
-    private String extractFieldPath(String rawPath) {
-        String[] parts = rawPath.split("\\.");
-        return parts.length > 0 ? parts[parts.length - 1] : rawPath;
+    private List<Object> extractFullPath(ConstraintViolation<?> violation) {
+        return List.of(violation.getPropertyPath().toString().split("\\."));
     }
 }
+

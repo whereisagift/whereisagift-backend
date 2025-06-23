@@ -24,6 +24,8 @@ jobs:
       - name: Generate application.properties
         run: |
           cat <<EOF >> src/main/resources/application.properties
+          sentry.dsn=${{ secrets.SENTRY_DSN }}
+          sentry.environment=${{ secrets.SENTRY_ENV }}
           spring.datasource.url=${{ secrets.SPRING_DATASOURCE_URL }}
           server.port=${{ secrets.SERVER_PORT }}
           spring.security.oauth2.resourceserver.jwt.issuer.uri=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}
