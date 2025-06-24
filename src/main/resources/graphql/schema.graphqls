@@ -3,6 +3,7 @@ scalar DateTime
 enum ProductSource {
     Manual
     Steam
+    Wildberries
 }
 
 type Price {
@@ -36,6 +37,15 @@ type Wishlist {
     description: String
     creator: User!
     wishes: [Wish!]!
+}
+
+type Product {
+    name: String!
+    description: String
+    link: String
+    img: String
+    type: ProductSource!
+    price: Price
 }
 
 type User {
@@ -84,6 +94,7 @@ input WishlistInput {
 type Query {
     me: User!
     user(id: ID!): User
+    productByUrl(url: String!): Product!
     wish(id: ID!): Wish!
     wishes: [Wish!]!
     wishlists: [Wishlist!]!
