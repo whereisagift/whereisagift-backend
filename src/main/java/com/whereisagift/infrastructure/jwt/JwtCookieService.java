@@ -11,11 +11,16 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class JwtCookieService implements BearerTokenResolver {
+    private static final String COOKIE_NAME = "jwt";
+    private static final Duration COOKIE_MAX_AGE = Duration.ofDays(1);
 
-    private final String cookieName = "jwt";
     private final DefaultBearerTokenResolver defaultResolver = new DefaultBearerTokenResolver();
 
     @Value("${cookie.domain:}")
@@ -23,40 +28,34 @@ public class JwtCookieService implements BearerTokenResolver {
 
     @Override
     public String resolve(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie c : cookies) {
-                if (c.getName().equals(cookieName)) {
-                    return c.getValue();
-                }
-            }
-        }
-        return defaultResolver.resolve(request);
+        return Optional.ofNullable(request.getCookies())
+                .flatMap(cookies -> Arrays.stream(cookies)
+                        .filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
+                        .findFirst()
+                        .map(Cookie::getValue))
+                .orElseGet(() -> defaultResolver.resolve(request));
     }
 
     public void writeToken(HttpServletResponse response, String token) {
-        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(cookieName, token)
-                .httpOnly(true)
-                .path("/")
-                .maxAge(3600);
-
-
-        if (cookieDomain.isBlank()) {
-            cookieBuilder.secure(true).sameSite("Strict");
-        } else {
-            cookieBuilder.domain(cookieDomain);
-        }
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie(token, COOKIE_MAX_AGE).toString());
     }
 
     public void clearToken(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(cookieName, "")
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("", Duration.ZERO).toString());
+    }
+
+    private ResponseCookie buildCookie(String value, Duration maxAge) {
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(COOKIE_NAME, value)
                 .httpOnly(true)
                 .path("/")
-                .maxAge(0)
-                .build();
+                .maxAge(maxAge)
+                .secure(cookieDomain.isBlank())
+                .sameSite(cookieDomain.isBlank() ? "Strict" : "Lax");
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        if (!cookieDomain.isBlank()) {
+            builder.domain(cookieDomain);
+        }
+
+        return builder.build();
     }
 }
