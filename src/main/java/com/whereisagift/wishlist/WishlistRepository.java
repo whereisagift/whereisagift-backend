@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
     Iterable<Wishlist> findByCreatorId(Long id);
-    boolean existsByIdAndCreatorId(Long wishlistId, Long creatorId);
 
 }
