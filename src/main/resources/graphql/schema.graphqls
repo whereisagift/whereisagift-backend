@@ -36,6 +36,8 @@ type Wishlist {
     description: String
     creator: User!
     wishes: [Wish!]!
+#    createdAt: DateTime!
+#    updatedAt: DateTime!
 }
 
 type User {
@@ -95,5 +97,6 @@ type Mutation {
     createWish(wishInput: WishInput!): Wish!
     updateWish(id: ID!, wishInput: WishInput!): Wish!
     deleteWish(id: ID!): Boolean!
-    createWishlist(wishlistInput: WishlistInput!): Wishlist
+    createWishlist(wishlistInput: WishlistInput!): Wishlist!
+    updateWishlist(id: ID!, wishlistInput: WishlistInput!): Wishlist!
 }
