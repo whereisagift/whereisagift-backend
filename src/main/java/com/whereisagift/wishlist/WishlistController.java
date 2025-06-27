@@ -44,7 +44,7 @@ public class WishlistController {
     @PreAuthorize("isAuthenticated()")
     @Transactional
     public Wishlist createWishlist(
-            @Argument WishlistInput wishlistInput,
+         @Valid   @Argument WishlistInput wishlistInput,
             @AuthenticationPrincipal Long userId
     ) {
 
