@@ -54,7 +54,7 @@ type User {
     username: String!
     firstName: String!
     lastName: String
-    photoUrl: String!
+    photoUrl: String
     wishlists: [Wishlist!]!
     wishes: [Wish!]!
 }
