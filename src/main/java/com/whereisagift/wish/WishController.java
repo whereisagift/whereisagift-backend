@@ -1,5 +1,7 @@
 package com.whereisagift.wish;
 
+import com.whereisagift.wish.dto.CreateWishInput;
+import com.whereisagift.wish.dto.UpdateWishInput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -33,14 +35,14 @@ public class WishController {
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
-    public Wish createWish(@Valid @Argument WishInput wishInput, @AuthenticationPrincipal Long userId) {
-        return wishService.createWish(wishInput, userId);
+    public Wish createWish(@Valid @Argument CreateWishInput input, @AuthenticationPrincipal Long userId) {
+        return wishService.createWish(input, userId);
     }
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
-    public Wish updateWish(@Argument Long id, @Valid @Argument WishInput wishInput, @AuthenticationPrincipal Long userId) {
-        return wishService.updateWish(id, wishInput, userId);
+    public Wish updateWish(@Argument Long id, @Valid @Argument UpdateWishInput input, @AuthenticationPrincipal Long userId) {
+        return wishService.updateWish(id, input, userId);
     }
 
     @MutationMapping

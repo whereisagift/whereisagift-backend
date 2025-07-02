@@ -20,14 +20,14 @@ public class SecurityConfig {
 
     private final JwtConverter jwtConverter;
     private final JwtCookieService jwtCookieService;
-
+    private final JwtDecoder jwtDecoder;
+    
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/graphql", "/graphiql", "/vendor/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 .oauth2ResourceServer(oauth -> oauth
@@ -37,6 +37,8 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtConverter)
                         )
                 );
+
         return http.build();
     }
 }
+

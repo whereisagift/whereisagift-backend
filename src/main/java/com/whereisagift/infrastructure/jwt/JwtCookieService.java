@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
-import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -20,9 +19,7 @@ import java.util.Optional;
 public class JwtCookieService implements BearerTokenResolver {
     private static final String COOKIE_NAME = "jwt";
     private static final Duration COOKIE_MAX_AGE = Duration.ofDays(1);
-
-    private final DefaultBearerTokenResolver defaultResolver = new DefaultBearerTokenResolver();
-
+    
     @Value("${cookie.domain:}")
     private String cookieDomain;
 
@@ -30,10 +27,13 @@ public class JwtCookieService implements BearerTokenResolver {
     public String resolve(HttpServletRequest request) {
         return Optional.ofNullable(request.getCookies())
                 .flatMap(cookies -> Arrays.stream(cookies)
-                        .filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
+                        .filter(c -> COOKIE_NAME.equals(c.getName()))
+                        .map(Cookie::getValue)
+                        .map(String::strip)
+                        .filter(t -> !t.isEmpty())
                         .findFirst()
-                        .map(Cookie::getValue))
-                .orElseGet(() -> defaultResolver.resolve(request));
+                )
+                .orElse(null);
     }
 
     public void writeToken(HttpServletResponse response, String token) {
