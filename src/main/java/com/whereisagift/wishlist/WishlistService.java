@@ -1,0 +1,31 @@
+package com.whereisagift.wishlist;
+
+import com.whereisagift.wish.Wish;
+import com.whereisagift.wishlist.dto.CreateWishlistInput;
+import graphql.GraphQLException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class WishlistService {
+
+    private final WishlistRepository wishlistRepository;
+    private final WishlistMapper wishlistMapper;
+
+    public Wishlist createWishlist(CreateWishlistInput input, Long userId) {
+
+        Wishlist wishlist = wishlistMapper.toDomain(input, userId);
+
+        return wishlistRepository.save(wishlist);
+
+    }
+
+}

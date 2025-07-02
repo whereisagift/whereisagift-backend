@@ -3,7 +3,9 @@ package com.whereisagift.wishlist;
 import com.whereisagift.user.UserRepository;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
+import com.whereisagift.wishlist.dto.CreateWishlistInput;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -12,17 +14,19 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Slf4j
 @Controller
+@Validated
 @RequiredArgsConstructor
 public class WishlistController {
 
-    private final WishRepository wishRepository;
-    private final UserRepository userRepository;
     private final WishlistRepository wishlistRepository;
+
+    private final WishlistService wishlistService;
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
@@ -33,20 +37,12 @@ public class WishlistController {
 
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public Wishlist createWishlist(@Argument WishlistInput wishlistInput, @AuthenticationPrincipal Long userId) {
-        List<Long> wishIds = wishlistInput.getWishIds();
+    public Wishlist createWishlist(
+            @Valid @Argument CreateWishlistInput input,
+            @AuthenticationPrincipal Long userId
+    ) {
 
-        Wishlist wishlist = new Wishlist();
-        wishlist.setName(wishlistInput.getName());
-        wishlist.setDescription(wishlistInput.getDescription());
-        wishlist.setCreator(userRepository.getReferenceById(userId));
+        return wishlistService.createWishlist(input, userId);
 
-        if (!wishIds.isEmpty()) {
-            List<Wish> wishes = wishRepository.findAllById(wishIds);
-            wishlist.setWishes(wishes);
-        }
-
-        return wishlistRepository.save(wishlist);
     }
 }
