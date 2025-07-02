@@ -17,14 +17,14 @@ public class Wishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 300)
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "creator_id")
+    @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
     @ManyToMany(mappedBy = "wishlists")
