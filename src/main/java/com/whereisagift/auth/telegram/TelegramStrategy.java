@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Profile("!local")
@@ -44,9 +45,12 @@ public class TelegramStrategy implements AuthStrategy {
         User user = new User();
         user.setTelegramId(payload.getTelegramId().longValue());
         user.setFirstName(payload.getFirstName());
-        if (payload.getLastName() != null) user.setLastName(payload.getLastName());
+        Optional.ofNullable(payload.getLastName())
+                .ifPresent(user::setLastName);
         user.setUsername(payload.getUsername());
-        user.setPhotoUrl(payload.getPhotoUrl());
+        Optional.ofNullable(payload.getPhotoUrl())
+                .ifPresent(user::setPhotoUrl);
+        user.setUsername(payload.getUsername());
         user.setAuthDate(payload.getAuthDate().longValue());
         return user;
     }
@@ -54,17 +58,16 @@ public class TelegramStrategy implements AuthStrategy {
 
     private boolean validateTelegramHash(AuthPayload payload) {
         try {
-            Map<String, String> hashMap = new LinkedHashMap<>();
-            hashMap.put("auth_date", payload.getAuthDate().toString());
-            hashMap.put("first_name", payload.getFirstName());
-            hashMap.put("id", payload.getTelegramId().toString());
-            if (payload.getLastName() != null) hashMap.put("last_name", payload.getLastName());
-            hashMap.put("photo_url", payload.getPhotoUrl());
-            hashMap.put("username", payload.getUsername());
-
-            String dataCheck = hashMap.entrySet().stream()
+            String dataCheck = Stream.of(
+                            Map.entry("auth_date", payload.getAuthDate().toString()),
+                            Map.entry("first_name", payload.getFirstName()),
+                            Map.entry("id", payload.getTelegramId().toString()),
+                            Map.entry("last_name", payload.getLastName()),
+                            Map.entry("photo_url", payload.getPhotoUrl()),
+                            Map.entry("username", payload.getUsername()))
+                    .filter(e -> e.getValue() != null)
                     .sorted(Map.Entry.comparingByKey())
-                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                    .map(e -> e.getKey() + "=" + e.getValue())
                     .collect(Collectors.joining("\n"));
 
             byte[] key = MessageDigest.getInstance("SHA-256")
