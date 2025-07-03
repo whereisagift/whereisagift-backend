@@ -54,7 +54,7 @@ type User {
     username: String!
     firstName: String!
     lastName: String
-    photoUrl: String!
+    photoUrl: String
     wishlists: [Wishlist!]!
     wishes: [Wish!]!
 }
@@ -64,7 +64,7 @@ input AuthPayload {
     first_name: String!
     last_name: String
     username: String!
-    photo_url: String!
+    photo_url: String
     auth_date: Int!
     hash: String!
 }
@@ -74,7 +74,7 @@ input PriceInput {
     value: Float!
 }
 
-input WishInput {
+input CreateWishInput {
     name: String!
     description: String
     link: String
@@ -83,6 +83,17 @@ input WishInput {
     type: ProductSource!
     price: PriceInput
     wishlistIds: [ID!]!
+}
+
+input UpdateWishInput {
+    name: String
+    description: String
+    link: String
+    img: String
+    rate: Int
+    type: ProductSource
+    price: PriceInput
+    wishlistIds: [ID!]
 }
 
 input CreateWishlistInput {
@@ -103,8 +114,8 @@ type Query {
 type Mutation {
     login(authPayload: AuthPayload!): User
     logout: Boolean!
-    createWish(wishInput: WishInput!): Wish!
-    updateWish(id: ID!, wishInput: WishInput!): Wish!
+    createWish(input: CreateWishInput!): Wish!
+    updateWish(id: ID!, input: UpdateWishInput!): Wish!
     deleteWish(id: ID!): Boolean!
     createWishlist(input: CreateWishlistInput!): Wishlist
 }
