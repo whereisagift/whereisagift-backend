@@ -25,14 +25,23 @@ import java.util.List;
 public class WishlistController {
 
     private final WishlistRepository wishlistRepository;
-
     private final WishlistService wishlistService;
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    @Transactional
     public Iterable<Wishlist> wishlists(@AuthenticationPrincipal Long userId) {
         return wishlistRepository.findByCreatorId(userId);
+    }
+
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
+    public Wishlist wishlist(
+            @Argument Long id,
+            @AuthenticationPrincipal Long userId
+    ) {
+
+        return wishlistService.getById(id, userId);
+
     }
 
     @MutationMapping

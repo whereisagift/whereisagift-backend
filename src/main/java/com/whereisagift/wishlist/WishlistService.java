@@ -28,4 +28,15 @@ public class WishlistService {
 
     }
 
+    public Wishlist getById(Long wishlistId, Long userId) {
+
+        Wishlist wishlist = wishlistRepository.findById(wishlistId)
+                .orElseThrow(() -> new GraphQLException("Wishlist not found"));
+
+        if (!Objects.equals(wishlist.getCreator().getId(), userId))
+            throw new GraphQLException("Access denied");
+
+        return wishlist;
+    }
+
 }
