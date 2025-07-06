@@ -108,6 +108,7 @@ type Query {
     productByUrl(url: String!): Product!
     wish(id: ID!): Wish!
     wishes: [Wish!]!
+    wishlist(id: ID!): Wishlist!
     wishlists: [Wishlist!]!
 }
 
