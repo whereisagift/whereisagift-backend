@@ -1,13 +1,16 @@
 package com.whereisagift.auth;
 
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 
 @Data
 public class AuthPayload {
     private Integer id;
     private String first_name;
+    @Nullable
     private String last_name;
+    @Nullable
     private String photo_url;
     private Integer auth_date;
     private String hash;

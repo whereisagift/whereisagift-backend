@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -16,9 +17,11 @@ public class CreateWishInput {
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     String name;
 
+    @Nullable
     @Size(max = 300, message = "Description must not exceed 300 characters")
     String description;
 
+    @Nullable
     @Size(max = 300, message = "Link must not exceed 300 characters")
     @Pattern(
             regexp = "^(https?://)?[\\w.-]+\\.[a-zA-Z]{2,}.*$",
@@ -26,6 +29,7 @@ public class CreateWishInput {
     )
     String link;
 
+    @Nullable
     @Size(max = 300)
     @Pattern(
             regexp = "^(https?://)?[\\w.-]+\\.[a-zA-Z]{2,}.*$",
@@ -36,6 +40,7 @@ public class CreateWishInput {
     @NotNull(message = "Type is required")
     ProductSource type;
 
+    @Nullable
     @Valid
     PriceInput price;
 

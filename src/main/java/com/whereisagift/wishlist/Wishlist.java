@@ -5,6 +5,7 @@ import com.whereisagift.wish.Wish;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class Wishlist {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
+    @Nullable
     @Column(name = "description", length = 300)
     private String description;
 
