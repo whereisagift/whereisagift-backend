@@ -5,6 +5,7 @@ import com.whereisagift.wish.dto.CreateWishInput;
 import com.whereisagift.wish.dto.UpdateWishInput;
 import com.whereisagift.wish.price.Price;
 import com.whereisagift.wish.price.PriceInput;
+import com.whereisagift.wish.product.ProductService;
 import com.whereisagift.wishlist.Wishlist;
 import com.whereisagift.wishlist.WishlistRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class WishMapper {
 
     private final WishlistRepository wishlistRepository;
+    private final ProductService productService;
 
     public Wish toEntity(CreateWishInput in, User creator) {
         Wish w = new Wish();
@@ -26,8 +28,8 @@ public class WishMapper {
         w.setName(in.getName());
         w.setDescription(in.getDescription());
         w.setLink(in.getLink());
+        w.setType(productService.detectSource(in.getLink()));
         w.setImg(in.getImg());
-        w.setType(in.getType());
         w.setRate(in.getRate());
         w.setPrice(mapPrice(in.getPrice()));
         w.setWishlists(loadWishlists(in.getWishlistIds()));
@@ -37,9 +39,7 @@ public class WishMapper {
     public Wish updateEntity(Wish wish, UpdateWishInput in) {
         if (in.getName() != null) wish.setName(in.getName());
         if (in.getDescription() != null) wish.setDescription(in.getDescription());
-        if (in.getLink() != null) wish.setLink(in.getLink());
         if (in.getImg() != null) wish.setImg(in.getImg());
-        if (in.getType() != null) wish.setType(in.getType());
         if (in.getRate() != null) wish.setRate(in.getRate());
         if (in.getPrice() != null) wish.setPrice(mapPrice(in.getPrice()));
         if (in.getWishlistIds() != null) wish.setWishlists(loadWishlists(in.getWishlistIds()));

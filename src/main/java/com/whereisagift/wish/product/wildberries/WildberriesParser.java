@@ -40,6 +40,11 @@ public class WildberriesParser implements ProductParser {
     }
 
     @Override
+    public ProductSource getSource() {
+        return ProductSource.Wildberries;
+    }
+
+    @Override
     public Product parse(String url) {
         String articleId = extractArticleId(url)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot extract article id from URL: " + url));
@@ -60,7 +65,7 @@ public class WildberriesParser implements ProductParser {
 
         return Product.builder()
                 .name(String.format("%s (%s)", name, brand))
-                .type(ProductSource.Wildberries)
+                .type(getSource())
                 .link(url)
                 .img(imgUrl)
                 .description(desc)

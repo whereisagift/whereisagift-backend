@@ -39,6 +39,11 @@ public class SteamParser implements ProductParser {
     }
 
     @Override
+    public ProductSource getSource() {
+        return ProductSource.Steam;
+    }
+
+    @Override
     public Product parse(String url) {
         String appId = extractAppId(url)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -55,7 +60,7 @@ public class SteamParser implements ProductParser {
 
         Product.ProductBuilder builder = Product.builder()
                 .name(name)
-                .type(ProductSource.Steam)
+                .type(getSource())
                 .link(url)
                 .img(imageUrl)
                 .description(description);

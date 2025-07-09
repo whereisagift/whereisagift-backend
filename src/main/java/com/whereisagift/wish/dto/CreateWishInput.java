@@ -1,7 +1,6 @@
 package com.whereisagift.wish.dto;
 
 import com.whereisagift.wish.price.PriceInput;
-import com.whereisagift.wish.product.ProductSource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -36,9 +35,6 @@ public class CreateWishInput {
             message = "Image URL must be a valid URL"
     )
     String img;
-
-    @NotNull(message = "Type is required")
-    ProductSource type;
 
     @Nullable
     @Valid
