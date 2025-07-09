@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -24,10 +25,12 @@ public class User {
     private Long telegramId;
     @Column(name = "first_name", nullable = false)
     private String firstName;
+    @Nullable
     @Column(name = "last_name")
     private String lastName;
     @Column(name = "telegram_username", nullable = false)
     private String username;
+    @Nullable
     @Column(name = "photo_url")
     private String photoUrl;
     @Column(name = "auth_date", nullable = false)

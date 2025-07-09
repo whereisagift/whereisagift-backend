@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,16 +60,18 @@ public class TelegramStrategy implements AuthStrategy {
     private boolean validateTelegramHash(AuthPayload payload) {
         try {
             String dataCheck = Stream.of(
-                            Map.entry("auth_date", payload.getAuthDate().toString()),
-                            Map.entry("first_name", payload.getFirstName()),
-                            Map.entry("id", payload.getTelegramId().toString()),
-                            Map.entry("last_name", payload.getLastName()),
-                            Map.entry("photo_url", payload.getPhotoUrl()),
-                            Map.entry("username", payload.getUsername()))
+                            new SimpleEntry<>("auth_date", payload.getAuthDate().toString()),
+                            new SimpleEntry<>("id", payload.getTelegramId().toString()),
+                            new SimpleEntry<>("username", payload.getUsername()),
+                            new SimpleEntry<>("first_name", payload.getFirstName()),
+                            new SimpleEntry<>("last_name", payload.getLastName()),
+                            new SimpleEntry<>("photo_url", payload.getPhotoUrl())
+                    )
                     .filter(e -> e.getValue() != null)
                     .sorted(Map.Entry.comparingByKey())
-                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .map(SimpleEntry::toString)
                     .collect(Collectors.joining("\n"));
+
 
             byte[] key = MessageDigest.getInstance("SHA-256")
                     .digest(telegramBotToken.getBytes(StandardCharsets.UTF_8));

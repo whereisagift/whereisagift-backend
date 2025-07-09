@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.lang.Nullable;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -44,15 +45,19 @@ public class Wish {
     @Column(nullable = false)
     private ProductSource type;
 
+    @Nullable
     @Column(length = 300)
     private String link;
 
+    @Nullable
     @Column(length = 300)
     private String img;
 
+    @Nullable
     @Column(length = 300)
     private String description;
 
+    @Nullable
     @Embedded
     private Price price;
 

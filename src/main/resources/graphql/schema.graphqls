@@ -80,7 +80,6 @@ input CreateWishInput {
     link: String
     img: String
     rate: Int
-    type: ProductSource!
     price: PriceInput
     wishlistIds: [ID!]!
 }
@@ -88,10 +87,8 @@ input CreateWishInput {
 input UpdateWishInput {
     name: String
     description: String
-    link: String
     img: String
     rate: Int
-    type: ProductSource
     price: PriceInput
     wishlistIds: [ID!]
 }
