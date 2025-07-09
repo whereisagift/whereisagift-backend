@@ -1,6 +1,7 @@
 package com.whereisagift.wish.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class ProductService {
         }
     }
 
-    public ProductSource detectSource(String url) {
+    public ProductSource detectSource(@Nullable String url) {
         return parsers.stream()
                 .filter(p -> p.supports(url))
                 .findFirst()
