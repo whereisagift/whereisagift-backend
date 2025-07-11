@@ -6,19 +6,22 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Component
 public class JwtProvider {
     @Autowired
+    JwtProperties jwtProperties;
+    @Autowired
     private JwtEncoder jwtEncoder;
 
-
     public String createToken(Long userId) {
+        Instant now = Instant.now();
+        Instant exp = now.plus(jwtProperties.getTtl());
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(userId.toString())
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+                .issuedAt(now)
+                .expiresAt(exp)
                 .build();
 
         JwsHeader headers = JwsHeader.with(() -> JwsAlgorithms.HS256).build();

@@ -1,5 +1,6 @@
 package com.whereisagift.infrastructure.security;
 
+import com.whereisagift.infrastructure.graphql.GraphQlAuthenticationEntryPoint;
 import com.whereisagift.infrastructure.jwt.JwtConverter;
 import com.whereisagift.infrastructure.jwt.JwtCookieService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,8 @@ public class SecurityConfig {
     private final JwtConverter jwtConverter;
     private final JwtCookieService jwtCookieService;
     private final JwtDecoder jwtDecoder;
-    
+    private final GraphQlAuthenticationEntryPoint graphQlAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -29,8 +31,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(graphQlAuthenticationEntryPoint)
+                )
                 .oauth2ResourceServer(oauth -> oauth
+                        .authenticationEntryPoint(graphQlAuthenticationEntryPoint)
                         .bearerTokenResolver(jwtCookieService)
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)

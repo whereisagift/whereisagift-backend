@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -18,8 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtCookieService implements BearerTokenResolver {
     private static final String COOKIE_NAME = "jwt";
-    private static final Duration COOKIE_MAX_AGE = Duration.ofDays(1);
-    
+    @Autowired
+    JwtProperties jwtProperties;
     @Value("${cookie.domain:}")
     private String cookieDomain;
 
@@ -37,7 +38,7 @@ public class JwtCookieService implements BearerTokenResolver {
     }
 
     public void writeToken(HttpServletResponse response, String token) {
-        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie(token, COOKIE_MAX_AGE).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie(token, jwtProperties.getTtl()).toString());
     }
 
     public void clearToken(HttpServletResponse response) {
