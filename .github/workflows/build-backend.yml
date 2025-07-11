@@ -53,27 +53,10 @@ jobs:
     needs: build-and-publish
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout whereisagift-devops repository
-        uses: actions/checkout@v4
-        with:
-          repository: whereisagift/whereisagift-devops
-          token: ${{ secrets.DEPLOY_TOKEN }}
-
-      - name: Update frontend version in whereisagift-devops
+      - name: Trigger application deployment
         run: |
-          BRANCH_NAME=${{ github.ref_name }}
-          
-          if [[ "$BRANCH_NAME" == "main" ]]; then
-            DOCKER_COMPOSE_PATH="./production/backend/compose.yml"
-          else
-            DOCKER_COMPOSE_PATH="./develop/backend/compose.yml"
-          fi
-          
-          # Обновляем compose.yml, заменяя версию образа
-          sed -i "s|image: ghcr.io/whereisagift/whereisagift-backend:[^ ]*|image: ghcr.io/whereisagift/whereisagift-backend:${{ github.sha }}|" "$DOCKER_COMPOSE_PATH"
-          
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add "$DOCKER_COMPOSE_PATH"
-          git commit -m "Update backend image version in $DOCKER_COMPOSE_PATH to ${{ github.sha }}"
-          git push
+          curl -X POST "${{ secrets.DOKPLOY_TRIGGER_API }}" \
+            -H "accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_TOKEN }}" \
+            -d "{\"applicationId\":\"${{ secrets.DOKPLOY_APP_ID }}\"}"
