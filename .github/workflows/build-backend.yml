@@ -55,8 +55,9 @@ jobs:
     steps:
       - name: Trigger application deployment
         run: |
-          curl -X POST "${{ secrets.DOKPLOY_TRIGGER_API }}" \
-            -H "accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "x-api-key: ${{ secrets.DOKPLOY_TOKEN }}" \
-            -d "{\"applicationId\":\"${{ secrets.DOKPLOY_APP_ID }}\"}"
+          curl -X 'POST' \
+          '${{ secrets.DOKPLOY_TRIGGER_API }}' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -H 'x-api-key: ${{ secrets.DOKPLOY_TOKEN }}' \
+          -d '{"applicationId": "${{ secrets.DOKPLOY_APP_ID }}"}'
