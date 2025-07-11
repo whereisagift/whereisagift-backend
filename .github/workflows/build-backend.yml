@@ -52,6 +52,7 @@ jobs:
   deploy:
     needs: build-and-publish
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'develop' }}
     steps:
       - name: Trigger application deployment
         run: |
