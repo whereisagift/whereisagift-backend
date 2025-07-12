@@ -15,39 +15,34 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'production' || 'develop' }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/whereisagift/whereisagift-backend
+          tags: |
+            type=sha,prefix=${{ github.ref_name == 'main' && 'production' || 'develop' }}-,
+            ${{ github.ref_name == 'main' && 'production' || 'develop' }}
 
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate application.properties
-        run: |
-          cat <<EOF >> src/main/resources/application.properties
-          sentry.dsn=${{ secrets.SENTRY_DSN }}
-          sentry.environment=${{ secrets.SENTRY_ENV }}
-          spring.datasource.url=${{ secrets.SPRING_DATASOURCE_URL }}
-          server.port=${{ secrets.SERVER_PORT }}
-          spring.security.oauth2.resourceserver.jwt.issuer.uri=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}
-          telegram.bot.token=${{ secrets.TELEGRAM_BOT_TOKEN }}
-          jwt.secret=${{ secrets.JWT_SECRET }}
-          cookie.domain=${{ secrets.COOKIE_DOMAIN }}
-          EOF
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Docker Image
-        run: |
-          IMAGE_NAME=ghcr.io/whereisagift/whereisagift-backend
-          TAG=${{ github.sha }}
-          BRANCH_TAG=${{ github.ref_name == 'main' && 'production' || 'develop' }}
-
-          # Build the Docker image with the necessary tags (SHA, latest, production/develop)
-          docker build -f ./deploy/Dockerfile \
-            -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG .
-
-          # Push the Docker images with the tags
-          docker push $IMAGE_NAME:$TAG
-          docker push $IMAGE_NAME:latest
-          docker push $IMAGE_NAME:$BRANCH_TAG
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: ./deploy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-to: type=gha,mode=max
+          cache-from: type=gha
 
   deploy:
     needs: build-and-publish
@@ -55,10 +50,11 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'production' || 'develop' }}
     steps:
       - name: Trigger application deployment
-        run: |
-          curl -X 'POST' \
-          '${{ secrets.DOKPLOY_TRIGGER_API }}' \
-          -H 'accept: application/json' \
-          -H 'Content-Type: application/json' \
-          -H 'x-api-key: ${{ secrets.DOKPLOY_TOKEN }}' \
-          -d '{"applicationId": "${{ secrets.DOKPLOY_APP_ID }}"}'
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.DOKPLOY_TRIGGER_API }}
+          method: POST
+          customHeaders: |
+            {"x-api-key":"${{ secrets.DOKPLOY_TOKEN }}"}
+          data: |
+            {"applicationId":"${{ secrets.DOKPLOY_APP_ID }}"}
