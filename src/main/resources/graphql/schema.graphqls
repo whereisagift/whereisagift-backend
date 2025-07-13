@@ -37,6 +37,8 @@ type Wishlist {
     description: String
     creator: User!
     wishes: [Wish!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
 }
 
 type Product {
