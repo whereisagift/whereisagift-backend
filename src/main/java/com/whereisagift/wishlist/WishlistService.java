@@ -2,6 +2,7 @@ package com.whereisagift.wishlist;
 
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
+import com.whereisagift.wishlist.dto.UpdateWishlistInput;
 import graphql.GraphQLException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class WishlistService {
 
     public Wishlist createWishlist(CreateWishlistInput input, Long userId) {
 
-        Wishlist wishlist = wishlistMapper.toDomain(input, userId);
+        Wishlist wishlist = wishlistMapper.toEntity(input, userId);
 
         return wishlistRepository.save(wishlist);
 
@@ -37,6 +38,14 @@ public class WishlistService {
             throw new GraphQLException("Access denied");
 
         return wishlist;
+    }
+
+    public Wishlist updateWishlist(UpdateWishlistInput input, Long userId) {
+
+        Wishlist wishlist = getById(input.getId(), userId);
+
+        return wishlistMapper.updateEntity(wishlist, input);
+
     }
 
 }

@@ -99,6 +99,13 @@ input CreateWishlistInput {
     wishIds: [ID!]
 }
 
+input UpdateWishlistInput {
+    id: ID!
+    name: String
+    description: String
+    wishIds: [ID!]
+}
+
 type Query {
     me: User!
     user(id: ID!): User
@@ -116,4 +123,5 @@ type Mutation {
     updateWish(id: ID!, input: UpdateWishInput!): Wish!
     deleteWish(id: ID!): Boolean!
     createWishlist(input: CreateWishlistInput!): Wishlist
+    updateWishlist(input: UpdateWishlistInput!): Wishlist
 }

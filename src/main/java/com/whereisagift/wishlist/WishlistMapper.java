@@ -2,9 +2,11 @@ package com.whereisagift.wishlist;
 
 import com.whereisagift.user.User;
 import com.whereisagift.user.UserRepository;
+import com.whereisagift.user.UserService;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
+import com.whereisagift.wishlist.dto.UpdateWishlistInput;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,15 +19,36 @@ import java.util.stream.Collectors;
 public class WishlistMapper {
 
     private final WishRepository wishRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public Wishlist toDomain(CreateWishlistInput input, Long userId) {
 
-        User creator = userRepository.getReferenceById(userId);
+    public Wishlist toEntity(CreateWishlistInput input, Long userId) {
+
+        User creator = userService.getById(userId); // delegate
         Wishlist wishlist = new Wishlist();
         wishlist.setName(input.getName());
         wishlist.setCreator(creator);
 
+        Optional.ofNullable(input.getDescription())
+                .ifPresent(wishlist::setDescription);
+
+        if (!input.getWishIds().isEmpty()) {
+
+            List<Long> wishIds = input.getWishIds().stream()
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+
+            List<Wish> wishes = wishRepository.findAllById(wishIds);
+            wishlist.setWishes(wishes);
+        }
+
+        return wishlist;
+    }
+
+    public Wishlist updateEntity(Wishlist wishlist, UpdateWishlistInput input) {
+
+        Optional.ofNullable(input.getName())
+                .ifPresent(wishlist::setName);
         Optional.ofNullable(input.getDescription())
                 .ifPresent(wishlist::setDescription);
 

@@ -4,6 +4,7 @@ import com.whereisagift.user.UserRepository;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
+import com.whereisagift.wishlist.dto.UpdateWishlistInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,17 @@ public class WishlistController {
     ) {
 
         return wishlistService.createWishlist(input, userId);
+
+    }
+
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public Wishlist updateWishlist(
+            @Valid @Argument UpdateWishlistInput input,
+            @AuthenticationPrincipal Long userId
+    ) {
+
+        return wishlistService.updateWishlist(input, userId);
 
     }
 }
