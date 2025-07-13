@@ -102,7 +102,6 @@ input CreateWishlistInput {
 }
 
 input UpdateWishlistInput {
-    id: ID!
     name: String
     description: String
     wishIds: [ID!]
@@ -125,5 +124,5 @@ type Mutation {
     updateWish(id: ID!, input: UpdateWishInput!): Wish!
     deleteWish(id: ID!): Boolean!
     createWishlist(input: CreateWishlistInput!): Wishlist!
-    updateWishlist(input: UpdateWishlistInput!): Wishlist!
+    updateWishlist(id: ID!, input: UpdateWishlistInput!): Wishlist!
 }
