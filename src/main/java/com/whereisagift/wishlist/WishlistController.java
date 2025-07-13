@@ -1,10 +1,7 @@
 package com.whereisagift.wishlist;
 
-import com.whereisagift.user.UserRepository;
-import com.whereisagift.wish.Wish;
-import com.whereisagift.wish.WishRepository;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
-import jakarta.transaction.Transactional;
+import com.whereisagift.wishlist.dto.UpdateWishlistInput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -39,9 +34,7 @@ public class WishlistController {
             @Argument Long id,
             @AuthenticationPrincipal Long userId
     ) {
-
         return wishlistService.getById(id, userId);
-
     }
 
     @MutationMapping
@@ -50,8 +43,16 @@ public class WishlistController {
             @Valid @Argument CreateWishlistInput input,
             @AuthenticationPrincipal Long userId
     ) {
-
         return wishlistService.createWishlist(input, userId);
+    }
 
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public Wishlist updateWishlist(
+            @Argument Long id,
+            @Valid @Argument UpdateWishlistInput input,
+            @AuthenticationPrincipal Long userId
+    ) {
+        return wishlistService.updateWishlist(id, input, userId);
     }
 }

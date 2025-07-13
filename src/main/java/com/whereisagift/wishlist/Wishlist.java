@@ -5,8 +5,11 @@ import com.whereisagift.wish.Wish;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.Nullable;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -32,5 +35,11 @@ public class Wishlist {
     @ManyToMany(mappedBy = "wishlists")
     private List<Wish> wishes;
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 }
