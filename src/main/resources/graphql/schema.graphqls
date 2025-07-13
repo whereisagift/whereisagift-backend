@@ -124,6 +124,6 @@ type Mutation {
     createWish(input: CreateWishInput!): Wish!
     updateWish(id: ID!, input: UpdateWishInput!): Wish!
     deleteWish(id: ID!): Boolean!
-    createWishlist(input: CreateWishlistInput!): Wishlist
-    updateWishlist(input: UpdateWishlistInput!): Wishlist
+    createWishlist(input: CreateWishlistInput!): Wishlist!
+    updateWishlist(input: UpdateWishlistInput!): Wishlist!
 }

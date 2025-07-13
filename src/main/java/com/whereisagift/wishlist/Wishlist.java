@@ -5,9 +5,9 @@ import com.whereisagift.wish.Wish;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.lang.Nullable;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -42,6 +42,4 @@ public class Wishlist {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
-
-
 }
