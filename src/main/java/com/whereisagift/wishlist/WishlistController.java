@@ -55,4 +55,13 @@ public class WishlistController {
     ) {
         return wishlistService.updateWishlist(id, input, userId);
     }
+
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public Boolean deleteWishlist(
+            @Argument Long id,
+            @AuthenticationPrincipal Long userId
+    ) {
+        return wishlistService.deleteWishlist(id, userId);
+    }
 }

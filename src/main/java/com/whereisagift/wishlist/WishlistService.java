@@ -42,4 +42,11 @@ public class WishlistService {
 
         return wishlistMapper.updateEntity(wishlist, input);
     }
+
+    public Boolean deleteWishlist(Long id, Long userId) {
+        Wishlist wishlist = getById(id, userId);
+        wishlistRepository.delete(wishlist);
+
+        return true;
+    }
 }
