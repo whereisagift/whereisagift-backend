@@ -1,7 +1,6 @@
 package com.whereisagift.wishlist;
 
 import com.whereisagift.user.User;
-import com.whereisagift.user.UserService;
 import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
@@ -18,8 +17,6 @@ import java.util.stream.Collectors;
 public class WishlistMapper {
 
     private final WishRepository wishRepository;
-    private final UserService userService;
-
 
     public Wishlist toEntity(CreateWishlistInput input, User creator) {
         Wishlist wishlist = new Wishlist();
@@ -41,7 +38,7 @@ public class WishlistMapper {
         return wishlist;
     }
 
-    public Wishlist updateEntity(Wishlist wishlist, UpdateWishlistInput input) {
+    public void updateEntity(Wishlist wishlist, UpdateWishlistInput input) {
         Optional.ofNullable(input.getName())
                 .ifPresent(wishlist::setName);
         Optional.ofNullable(input.getDescription())
@@ -55,7 +52,5 @@ public class WishlistMapper {
             List<Wish> wishes = wishRepository.findAllById(wishIds);
             wishlist.setWishes(wishes);
         }
-
-        return wishlist;
     }
 }
