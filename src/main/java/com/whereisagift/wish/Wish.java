@@ -55,7 +55,7 @@ public class Wish {
 
   @Nullable @Embedded private Price price;
 
-  @Column()
+  @Column(nullable = false)
   @Check(constraints = "rate BETWEEN 0 AND 5")
   private Integer rate;
 

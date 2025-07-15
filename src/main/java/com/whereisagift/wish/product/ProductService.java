@@ -25,6 +25,7 @@ public class ProductService {
   }
 
   public ProductSource detectSource(@Nullable String url) {
+    if (url == null) return ProductSource.Manual;
     return parsers.stream()
         .filter(p -> p.supports(url))
         .findFirst()
