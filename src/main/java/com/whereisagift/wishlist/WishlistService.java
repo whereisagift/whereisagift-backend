@@ -39,7 +39,15 @@ public class WishlistService {
 
   public Wishlist updateWishlist(Long id, UpdateWishlistInput input, Long userId) {
     Wishlist wishlist = getById(id, userId);
+    wishlistMapper.updateEntity(wishlist, input);
 
-    return wishlistMapper.updateEntity(wishlist, input);
+    return wishlistRepository.save(wishlist);
+  }
+
+  public Boolean deleteWishlist(Long id, Long userId) {
+    Wishlist wishlist = getById(id, userId);
+    wishlistRepository.delete(wishlist);
+
+    return true;
   }
 }

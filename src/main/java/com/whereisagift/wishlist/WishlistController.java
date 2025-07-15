@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RequiredArgsConstructor
 public class WishlistController {
+
   private final WishlistRepository wishlistRepository;
   private final WishlistService wishlistService;
 
@@ -47,5 +48,11 @@ public class WishlistController {
       @Valid @Argument UpdateWishlistInput input,
       @AuthenticationPrincipal Long userId) {
     return wishlistService.updateWishlist(id, input, userId);
+  }
+
+  @MutationMapping
+  @PreAuthorize("isAuthenticated()")
+  public Boolean deleteWishlist(@Argument Long id, @AuthenticationPrincipal Long userId) {
+    return wishlistService.deleteWishlist(id, userId);
   }
 }
