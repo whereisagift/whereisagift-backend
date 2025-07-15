@@ -10,7 +10,6 @@ import org.mapstruct.*;
     componentModel = "spring",
     uses = {PriceMapper.class, ProductSourceMapper.class})
 public interface WishMapper {
-
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
