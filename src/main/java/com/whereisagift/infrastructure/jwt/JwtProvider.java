@@ -9,29 +9,22 @@ import java.time.Instant;
 
 @Component
 public class JwtProvider {
-    @Autowired
-    JwtProperties jwtProperties;
-    @Autowired
-    private JwtEncoder jwtEncoder;
+  @Autowired JwtProperties jwtProperties;
+  @Autowired private JwtEncoder jwtEncoder;
 
-    public String createToken(Long userId) {
-        Instant now = Instant.now();
-        Instant exp = now.plus(jwtProperties.getTtl());
+  public String createToken(Long userId) {
+    Instant now = Instant.now();
+    Instant exp = now.plus(jwtProperties.getTtl());
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(userId.toString())
-                .issuedAt(now)
-                .expiresAt(exp)
-                .build();
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder().subject(userId.toString()).issuedAt(now).expiresAt(exp).build();
 
-        JwsHeader headers = JwsHeader.with(() -> JwsAlgorithms.HS256).build();
+    JwsHeader headers = JwsHeader.with(() -> JwsAlgorithms.HS256).build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims))
-                .getTokenValue();
-    }
+    return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
+  }
 
-    public Long getAuthorizationPrincipal(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
-    }
-
+  public Long getAuthorizationPrincipal(Jwt jwt) {
+    return Long.valueOf(jwt.getSubject());
+  }
 }

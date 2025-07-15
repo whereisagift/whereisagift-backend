@@ -9,14 +9,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+  private final UserRepository userRepository;
 
-    private final UserRepository userRepository;
+  public User getById(Long userId) {
 
-    public User getById(Long userId) {
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new GraphQLException("User not found"));
-
-    }
-
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new GraphQLException("User not found"));
+  }
 }

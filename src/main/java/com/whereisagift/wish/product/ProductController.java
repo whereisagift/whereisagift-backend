@@ -9,12 +9,11 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
+  private final ProductService productService;
 
-    private final ProductService productService;
-
-    @QueryMapping
-    @PreAuthorize("isAuthenticated()")
-    public Product productByUrl(@Argument String url) {
-        return productService.parse(url);
-    }
+  @QueryMapping
+  @PreAuthorize("isAuthenticated()")
+  public Product productByUrl(@Argument String url) {
+    return productService.parse(url);
+  }
 }

@@ -14,22 +14,22 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LocalStrategy implements AuthStrategy {
+  private final UserRepository userRepository;
 
-    private final UserRepository userRepository;
+  @Value("${local.user.id:}")
+  private String localUserId;
 
-    @Value("${local.user.id:}")
-    private String localUserId;
-
-    @Override
-    public User authenticate(AuthPayload payload) {
-        long uid;
-        try {
-            uid = Long.parseLong(localUserId);
-        } catch (NumberFormatException ex) {
-            throw new GraphQLException("Invalid local.user.id: " + localUserId);
-        }
-        return userRepository.findById(uid)
-                .orElseThrow(() ->
-                        new GraphQLException("User not found: " + uid));
+  @Override
+  public User authenticate(AuthPayload payload) {
+    long uid;
+    try {
+      uid = Long.parseLong(localUserId);
+    } catch (NumberFormatException ex) {
+      throw new GraphQLException("Invalid local.user.id: " + localUserId);
     }
+
+    return userRepository
+        .findById(uid)
+        .orElseThrow(() -> new GraphQLException("User not found: " + uid));
+  }
 }

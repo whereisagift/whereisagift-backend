@@ -6,56 +6,48 @@ import com.whereisagift.wish.Wish;
 import com.whereisagift.wish.WishRepository;
 import com.whereisagift.wishlist.dto.CreateWishlistInput;
 import com.whereisagift.wishlist.dto.UpdateWishlistInput;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class WishlistMapper {
+  private final WishRepository wishRepository;
+  private final UserService userService;
 
-    private final WishRepository wishRepository;
-    private final UserService userService;
+  public Wishlist toEntity(CreateWishlistInput input, User creator) {
+    Wishlist wishlist = new Wishlist();
+    wishlist.setName(input.getName());
+    wishlist.setCreator(creator);
 
+    Optional.ofNullable(input.getDescription()).ifPresent(wishlist::setDescription);
 
-    public Wishlist toEntity(CreateWishlistInput input, User creator) {
-        Wishlist wishlist = new Wishlist();
-        wishlist.setName(input.getName());
-        wishlist.setCreator(creator);
+    if (!input.getWishIds().isEmpty()) {
+      List<Long> wishIds =
+          input.getWishIds().stream().map(Long::valueOf).collect(Collectors.toList());
 
-        Optional.ofNullable(input.getDescription())
-                .ifPresent(wishlist::setDescription);
-
-        if (!input.getWishIds().isEmpty()) {
-            List<Long> wishIds = input.getWishIds().stream()
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
-
-            List<Wish> wishes = wishRepository.findAllById(wishIds);
-            wishlist.setWishes(wishes);
-        }
-
-        return wishlist;
+      List<Wish> wishes = wishRepository.findAllById(wishIds);
+      wishlist.setWishes(wishes);
     }
 
-    public Wishlist updateEntity(Wishlist wishlist, UpdateWishlistInput input) {
-        Optional.ofNullable(input.getName())
-                .ifPresent(wishlist::setName);
-        Optional.ofNullable(input.getDescription())
-                .ifPresent(wishlist::setDescription);
+    return wishlist;
+  }
 
-        if (!input.getWishIds().isEmpty()) {
-            List<Long> wishIds = input.getWishIds().stream()
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
+  public Wishlist updateEntity(Wishlist wishlist, UpdateWishlistInput input) {
+    Optional.ofNullable(input.getName()).ifPresent(wishlist::setName);
+    Optional.ofNullable(input.getDescription()).ifPresent(wishlist::setDescription);
 
-            List<Wish> wishes = wishRepository.findAllById(wishIds);
-            wishlist.setWishes(wishes);
-        }
+    if (!input.getWishIds().isEmpty()) {
+      List<Long> wishIds =
+          input.getWishIds().stream().map(Long::valueOf).collect(Collectors.toList());
 
-        return wishlist;
+      List<Wish> wishes = wishRepository.findAllById(wishIds);
+      wishlist.setWishes(wishes);
     }
+
+    return wishlist;
+  }
 }
