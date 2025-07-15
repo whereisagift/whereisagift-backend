@@ -43,4 +43,11 @@ public class WishlistService {
 
         return wishlistRepository.save(wishlist);
     }
+
+    public Boolean deleteWishlist(Long id, Long userId) {
+        Wishlist wishlist = getById(id, userId);
+        wishlistRepository.delete(wishlist);
+
+        return true;
+    }
 }

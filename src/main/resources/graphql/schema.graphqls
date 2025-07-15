@@ -125,4 +125,5 @@ type Mutation {
     deleteWish(id: ID!): Boolean!
     createWishlist(input: CreateWishlistInput!): Wishlist!
     updateWishlist(id: ID!, input: UpdateWishlistInput!): Wishlist!
+    deleteWishlist(id: ID!): Boolean!
 }
