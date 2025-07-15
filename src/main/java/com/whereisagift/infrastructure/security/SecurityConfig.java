@@ -18,32 +18,23 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+  private final JwtConverter jwtConverter;
+  private final JwtCookieService jwtCookieService;
+  private final JwtDecoder jwtDecoder;
+  private final GraphQlAuthenticationEntryPoint graphQlAuthenticationEntryPoint;
 
-    private final JwtConverter jwtConverter;
-    private final JwtCookieService jwtCookieService;
-    private final JwtDecoder jwtDecoder;
-    private final GraphQlAuthenticationEntryPoint graphQlAuthenticationEntryPoint;
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(graphQlAuthenticationEntryPoint))
+        .oauth2ResourceServer(
+            oauth ->
+                oauth
+                    .authenticationEntryPoint(graphQlAuthenticationEntryPoint)
+                    .bearerTokenResolver(jwtCookieService)
+                    .jwt(jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtConverter)));
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(graphQlAuthenticationEntryPoint)
-                )
-                .oauth2ResourceServer(oauth -> oauth
-                        .authenticationEntryPoint(graphQlAuthenticationEntryPoint)
-                        .bearerTokenResolver(jwtCookieService)
-                        .jwt(jwt -> jwt
-                                .decoder(jwtDecoder)
-                                .jwtAuthenticationConverter(jwtConverter)
-                        )
-                );
-
-        return http.build();
-    }
+    return http.build();
+  }
 }
-

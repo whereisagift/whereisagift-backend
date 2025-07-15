@@ -11,18 +11,17 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class UserController {
+  private final UserRepository userRepository;
 
-    private final UserRepository userRepository;
+  @QueryMapping
+  public User user(@Argument Long id) {
+    return userRepository.findById(id).orElse(null);
+  }
 
-    @QueryMapping
-    public User user(@Argument Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @QueryMapping
-    @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public User me(@AuthenticationPrincipal Long userId) {
-        return userRepository.getReferenceById(userId);
-    }
+  @QueryMapping
+  @PreAuthorize("isAuthenticated()")
+  @Transactional
+  public User me(@AuthenticationPrincipal Long userId) {
+    return userRepository.getReferenceById(userId);
+  }
 }

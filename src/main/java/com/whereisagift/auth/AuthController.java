@@ -14,37 +14,36 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
+  private final AuthService authService;
+  private final JwtProvider jwtProvider;
+  private final JwtCookieService jwtCookieService;
 
-    private final AuthService authService;
-    private final JwtProvider jwtProvider;
-    private final JwtCookieService jwtCookieService;
+  @MutationMapping
+  public User login(@Argument AuthPayload authPayload) {
+    User user = authService.login(authPayload);
+    jwtCookieService.writeToken(currentResponse(), jwtProvider.createToken(user.getId()));
 
-    @MutationMapping
-    public User login(@Argument AuthPayload authPayload) {
-        User user = authService.login(authPayload);
-        jwtCookieService.writeToken(currentResponse(), jwtProvider.createToken(user.getId()));
+    return user;
+  }
 
-        return user;
+  @MutationMapping
+  private boolean logout() {
+    jwtCookieService.clearToken(currentResponse());
+
+    return true;
+  }
+
+  private HttpServletResponse currentResponse() {
+    ServletRequestAttributes attrs =
+        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    if (attrs == null) {
+      throw new IllegalStateException("No current request attributes");
+    }
+    HttpServletResponse response = attrs.getResponse();
+    if (response == null) {
+      throw new IllegalStateException("No current HTTP response");
     }
 
-
-    @MutationMapping
-    private boolean logout() {
-        jwtCookieService.clearToken(currentResponse());
-
-        return true;
-    }
-
-    private HttpServletResponse currentResponse() {
-        ServletRequestAttributes attrs =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs == null) {
-            throw new IllegalStateException("No current request attributes");
-        }
-        HttpServletResponse response = attrs.getResponse();
-        if (response == null) {
-            throw new IllegalStateException("No current HTTP response");
-        }
-        return response;
-    }
+    return response;
+  }
 }

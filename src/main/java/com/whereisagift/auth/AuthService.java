@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final AuthStrategy strategy;    // единственный бин в контексте
+  private final AuthStrategy strategy; // единственный бин в контексте
 
-    public User login(AuthPayload payload) {
-        return strategy.authenticate(payload);
-    }
+  public User login(AuthPayload payload) {
+    return strategy.authenticate(payload);
+  }
 }

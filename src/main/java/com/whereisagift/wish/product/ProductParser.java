@@ -1,9 +1,9 @@
 package com.whereisagift.wish.product;
 
 public interface ProductParser {
-    boolean supports(String source);
+  boolean supports(String source);
 
-    ProductSource getSource();
+  ProductSource getSource();
 
-    Product parse(String url);
+  Product parse(String url);
 }
