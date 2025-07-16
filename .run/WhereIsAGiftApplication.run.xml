@@ -7,6 +7,7 @@
     <selectedOptions>
       <option name="environmentVariables" visible="false" />
     </selectedOptions>
+    <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="true" />

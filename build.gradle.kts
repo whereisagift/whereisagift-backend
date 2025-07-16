@@ -9,11 +9,6 @@ plugins {
 group = "com.whereisagift"
 version = "0.0.1-SNAPSHOT"
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
 
 configurations {
     compileOnly {
@@ -69,17 +64,30 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<ProcessResources> {
+    filteringCharset = "UTF-8"
+}
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs = listOf("-Dfile.encoding=UTF-8")
 }
 
+
 tasks.named<BootRun>("bootRun") {
-    // читаем переменную окружения, или даём дефолт "8000"
-    val debugPort = System.getenv("DEBUG_PORT_ON_CONTAINER") ?: "8000"
-    // заставляем JDWP слушать на всех интерфейсах и на нужном порту
     jvmArgs = listOf(
-        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:$debugPort"
+        "-Dfile.encoding=UTF-8",
+        // ваш JDWP-порт
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000"
     )
 }

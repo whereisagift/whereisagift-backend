@@ -7,25 +7,24 @@ import java.util.List;
 import org.springframework.lang.Nullable;
 
 public record CreateWishInput(
-    @NotBlank(message = "Name is required")
-        @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @NotBlank(message = "{wish.validation.name.NotBlank}")
+        @Size(min = 2, max = 100, message = "{wish.validation.name.Size}")
         String name,
-    @Nullable @Size(max = 300, message = "Description must not exceed 300 characters")
-        String description,
+    @Nullable @Size(max = 300, message = "{wish.validation.description.Size}") String description,
     @Nullable
-        @Size(max = 300, message = "Link must not exceed 300 characters")
+        @Size(max = 300, message = "{wish.validation.link.Size}")
         @Pattern(
             regexp = "^(https?://)?[\\w.-]+\\.[a-zA-Z]{2,}.*$",
-            message = "Link must be a valid URL")
+            message = "{wish.validation.link.Pattern}")
         String link,
     @Nullable
-        @Size(max = 300)
+        @Size(max = 300, message = "{wish.validation.img.Size}")
         @Pattern(
             regexp = "^(https?://)?[\\w.-]+\\.[a-zA-Z]{2,}.*$",
-            message = "Image URL must be a valid URL")
+            message = "{wish.validation.img.Pattern}")
         String img,
     @Nullable @Valid PriceInput price,
-    @Size(min = 1, message = "At least one wishlistId is required") List<@NotNull Long> wishlistIds,
-    @Min(value = 0, message = "Rate must be at least 0")
-        @Max(value = 5, message = "Rate must be at most 5")
+    @Size(min = 1, message = "{wish.validation.rate.Size}") List<@NotNull Long> wishlistIds,
+    @Min(value = 0, message = "{wish.validation.rate.Min}")
+        @Max(value = 5, message = "{wish.validation.rate.Max}")
         Integer rate) {}
