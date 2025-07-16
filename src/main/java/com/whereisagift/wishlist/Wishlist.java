@@ -3,29 +3,42 @@ package com.whereisagift.wishlist;
 import com.whereisagift.user.User;
 import com.whereisagift.wish.Wish;
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Data
 @Table(name = "wishlists")
 @NoArgsConstructor
 public class Wishlist {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name", length = 100, nullable = false)
+  private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "creator_id")
-    private User creator;
+  @Nullable
+  @Column(name = "description", length = 300)
+  private String description;
 
-    @ManyToMany(mappedBy = "wishlists")
-    private List<Wish> wishes;
+  @ManyToOne
+  @JoinColumn(name = "creator_id", nullable = false)
+  private User creator;
 
+  @ManyToMany(mappedBy = "wishlists")
+  private List<Wish> wishes;
 
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private OffsetDateTime createdAt;
+
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
+  private OffsetDateTime updatedAt;
 }

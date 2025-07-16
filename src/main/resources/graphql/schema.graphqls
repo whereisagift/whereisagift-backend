@@ -1,34 +1,129 @@
-type User {
-    id: ID!
-    name: String!
-    wishlists: [Wishlist]
-    wishes: [Wish]
+scalar DateTime
+
+enum ProductSource {
+    Manual
+    Steam
+    Wildberries
 }
 
-type Wishlist {
-    id: ID!
-    name: String!
-    creator: User!
-    wishes: [Wish]
+type Price {
+    currency: String!
+    value: Float!
+}
+
+type Booking {
+    nickname: String!
+    date: String!
 }
 
 type Wish {
     id: ID!
     name: String!
+    description: String
+    link: String
+    img: String
+    rate: Int!
+    type: ProductSource!
+    price: Price
     creator: User!
-    wishlist: Wishlist
+    wishlists: [Wishlist!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type Wishlist {
+    id: ID!
+    name: String!
+    description: String
+    creator: User!
+    wishes: [Wish!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type Product {
+    name: String!
+    description: String
+    link: String
+    img: String
+    type: ProductSource!
+    price: Price
+}
+
+type User {
+    id: ID!
+    telegramId: String!
+    username: String!
+    firstName: String!
+    lastName: String
+    photoUrl: String
+    wishlists: [Wishlist!]!
+    wishes: [Wish!]!
+}
+
+input AuthPayload {
+    id: Int!
+    first_name: String!
+    last_name: String
+    username: String!
+    photo_url: String
+    auth_date: Int!
+    hash: String!
+}
+
+input PriceInput {
+    currency: String!
+    value: Float!
+}
+
+input CreateWishInput {
+    name: String!
+    description: String
+    link: String
+    img: String
+    rate: Int
+    price: PriceInput
+    wishlistIds: [ID!]!
+}
+
+input UpdateWishInput {
+    name: String
+    description: String
+    img: String
+    rate: Int
+    price: PriceInput
+    wishlistIds: [ID!]
+}
+
+input CreateWishlistInput {
+    name: String!
+    description: String
+    wishIds: [ID!]
+}
+
+input UpdateWishlistInput {
+    name: String
+    description: String
+    wishIds: [ID!]
 }
 
 type Query {
-    users: [User!]!
+    me: User!
     user(id: ID!): User
-    wishlists: [Wishlist]
-    wishes: [Wish]
+    productByUrl(url: String!): Product!
+    wish(id: ID!): Wish!
+    wishes: [Wish!]!
+    wishlist(id: ID!): Wishlist!
+    wishlists: [Wishlist!]!
 }
 
 type Mutation {
-    createUser(name: String!): User
-    createWishlist(name: String!): Wishlist
-    createWish(name: String!): Wish
+    login(authPayload: AuthPayload!): User
+    logout: Boolean!
+    createWish(input: CreateWishInput!): Wish!
+    updateWish(id: ID!, input: UpdateWishInput!): Wish!
+    deleteWish(id: ID!): Boolean!
+    createWishlist(input: CreateWishlistInput!): Wishlist!
+    updateWishlist(id: ID!, input: UpdateWishlistInput!): Wishlist!
+    deleteWishlist(id: ID!): Boolean!
 }
-

@@ -1,45 +1,58 @@
 package com.whereisagift.wishlist;
 
-import com.whereisagift.user.User;
-import com.whereisagift.user.UserRepository;
+import com.whereisagift.wishlist.dto.CreateWishlistInput;
+import com.whereisagift.wishlist.dto.UpdateWishlistInput;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-
-import java.util.List;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Controller
+@Validated
+@RequiredArgsConstructor
 public class WishlistController {
 
-    private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
+  private final WishlistRepository wishlistRepository;
+  private final WishlistService wishlistService;
 
-    public WishlistController(WishlistRepository wishlistRepository, UserRepository userRepository) {
-        this.wishlistRepository = wishlistRepository;
-        this.userRepository = userRepository;
-    }
+  @QueryMapping
+  @PreAuthorize("isAuthenticated()")
+  public Iterable<Wishlist> wishlists(@AuthenticationPrincipal Long userId) {
+    return wishlistRepository.findByCreatorId(userId);
+  }
 
-    @QueryMapping
-    public Wishlist wishlist(@Argument Long id) {
-        return wishlistRepository.findById(id).orElse(null);
-    }
+  @QueryMapping
+  @PreAuthorize("isAuthenticated()")
+  public Wishlist wishlist(@Argument Long id, @AuthenticationPrincipal Long userId) {
+    return wishlistService.getById(id, userId);
+  }
 
-    @QueryMapping
-    public Iterable<Wishlist> wishlists() {
-        return wishlistRepository.findAll();
-    }
+  @MutationMapping
+  @PreAuthorize("isAuthenticated()")
+  public Wishlist createWishlist(
+      @Valid @Argument CreateWishlistInput input, @AuthenticationPrincipal Long userId) {
+    return wishlistService.createWishlist(input, userId);
+  }
 
-    @MutationMapping
-    public Wishlist createWishlist(@Argument String name) {
-        Wishlist wishlist = new Wishlist();
-        wishlist.setName(name);
-        User user = userRepository.findById(1L).orElse(null);
-        wishlist.setCreator(user);
+  @MutationMapping
+  @PreAuthorize("isAuthenticated()")
+  public Wishlist updateWishlist(
+      @Argument Long id,
+      @Valid @Argument UpdateWishlistInput input,
+      @AuthenticationPrincipal Long userId) {
+    return wishlistService.updateWishlist(id, input, userId);
+  }
 
-        return wishlistRepository.save(wishlist);
-    }
-
+  @MutationMapping
+  @PreAuthorize("isAuthenticated()")
+  public Boolean deleteWishlist(@Argument Long id, @AuthenticationPrincipal Long userId) {
+    return wishlistService.deleteWishlist(id, userId);
+  }
 }
